@@ -1,6 +1,8 @@
 # AUR packages installed via install/packaging/aur.sh
 
 pokemon-colorscripts-git
+tzupdate
+ufw-docker
 walker-bin
 wl-screenrec
 yaru-icon-theme
