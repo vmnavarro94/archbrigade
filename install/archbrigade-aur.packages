@@ -1,6 +1,15 @@
 # AUR packages installed via install/packaging/aur.sh
 
+asdcontrol-git
+blueberry
+hyprland-qtutils
+localsend
+omarchy-lazyvim
+pinta
 pokemon-colorscripts-git
+python-terminaltexteffects
+spotify
+ttf-ia-writer
 tzupdate
 ufw-docker
 walker-bin
