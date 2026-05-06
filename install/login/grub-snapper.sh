@@ -55,11 +55,25 @@ EOF
   fi
 
   # --- GRUB defaults ---
+  # Preserve existing kernel params if /etc/default/grub already exists
+  if [[ -f /etc/default/grub ]]; then
+    sudo cp /etc/default/grub /etc/default/grub.bak
+    EXISTING_CMDLINE_DEFAULT=$(grep "^GRUB_CMDLINE_LINUX_DEFAULT=" /etc/default/grub | sed 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/\1/')
+    EXISTING_CMDLINE=$(grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | sed 's/GRUB_CMDLINE_LINUX="\(.*\)"/\1/')
+    # Add splash for plymouth if not already present
+    [[ "$EXISTING_CMDLINE_DEFAULT" != *"splash"* ]] && EXISTING_CMDLINE_DEFAULT="$EXISTING_CMDLINE_DEFAULT splash"
+    echo "Existing GRUB config backed up to /etc/default/grub.bak"
+  else
+    EXISTING_CMDLINE_DEFAULT="quiet splash"
+    EXISTING_CMDLINE=""
+  fi
+
   sudo tee /etc/default/grub >/dev/null <<EOF
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=3
 GRUB_DISTRIBUTOR="ArchBrigade"
-GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX_DEFAULT="$EXISTING_CMDLINE_DEFAULT"
+GRUB_CMDLINE_LINUX="$EXISTING_CMDLINE"
 
 # Graphical console
 GRUB_GFXMODE=auto
