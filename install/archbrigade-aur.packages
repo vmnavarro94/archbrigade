@@ -1,6 +1,9 @@
 # AUR packages installed via install/packaging/aur.sh
 
 pokemon-colorscripts-git
+walker-bin
+wl-screenrec
+yaru-icon-theme
 zen-browser
 zsh-autosuggestions
 zsh-syntax-highlighting

@@ -1,3 +1,4 @@
+run_logged $ARCHBRIGADE_INSTALL/packaging/bootstrap-yay.sh
 run_logged $ARCHBRIGADE_INSTALL/packaging/base.sh
 run_logged $ARCHBRIGADE_INSTALL/packaging/aur.sh
 run_logged $ARCHBRIGADE_INSTALL/packaging/fonts.sh
