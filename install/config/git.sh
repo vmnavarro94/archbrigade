@@ -2,13 +2,13 @@
 mkdir -p ~/.config/git
 touch ~/.config/git/config
 
-# Set common git aliases only if not already set
-git config --global --get alias.co  &>/dev/null || git config --global alias.co checkout
-git config --global --get alias.br  &>/dev/null || git config --global alias.br branch
-git config --global --get alias.ci  &>/dev/null || git config --global alias.ci commit
-git config --global --get alias.st  &>/dev/null || git config --global alias.st status
-git config --global --get pull.rebase        &>/dev/null || git config --global pull.rebase true
-git config --global --get init.defaultBranch &>/dev/null || git config --global init.defaultBranch master
+# Set common git aliases and settings
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
+git config --global pull.rebase true
+git config --global init.defaultBranch master
 
 # Set identification only if not already configured
 if [[ -z "$(git config --global --get user.name 2>/dev/null)" ]]; then
