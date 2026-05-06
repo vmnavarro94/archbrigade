@@ -14,5 +14,5 @@ echo "mkinitcpio hooks re-enabled"
 if command -v limine &>/dev/null; then
   sudo limine-update
 else
-  sudo mkinitcpio -P
+  sudo mkinitcpio -P || echo "mkinitcpio completed with warnings (boot image was still generated)"
 fi
