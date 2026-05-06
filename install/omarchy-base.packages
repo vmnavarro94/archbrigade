@@ -1,8 +1,8 @@
 # Omarchy core package list installed via install/packages.sh
 # This file is also used by the ISO builder when determining needs
 
-1password-beta
-1password-cli
+bitwarden
+rbw
 alacritty
 asdcontrol-git
 avahi
@@ -61,7 +61,6 @@ lazygit
 less
 libyaml
 libqalculate
-libreoffice
 llvm
 localsend
 luarocks
@@ -80,7 +79,6 @@ nvim
 obs-studio
 obsidian
 os-prober
-omarchy-chromium
 omarchy-lazyvim
 pamixer
 pinta
@@ -97,7 +95,6 @@ qt5-wayland
 ripgrep
 satty
 sddm
-signal-desktop
 slurp
 spotify
 starship
@@ -110,7 +107,6 @@ tree-sitter-cli
 ttf-cascadia-mono-nerd
 ttf-ia-writer
 ttf-jetbrains-mono-nerd
-typora
 tzupdate
 ufw
 ufw-docker
@@ -134,3 +130,4 @@ xournalpp
 yaru-icon-theme
 yay
 zoxide
+zsh

@@ -2,6 +2,10 @@
 # - limit log size to avoid running out of disk
 # - use host's DNS resolver
 sudo mkdir -p /etc/docker
+if [[ -f /etc/docker/daemon.json ]]; then
+  sudo cp /etc/docker/daemon.json /etc/docker/daemon.json.bak
+  echo "Existing daemon.json backed up to /etc/docker/daemon.json.bak"
+fi
 sudo tee /etc/docker/daemon.json >/dev/null <<'EOF'
 {
     "log-driver": "json-file",

@@ -12,10 +12,13 @@ xdg-mime default imv.desktop image/tiff
 # Open PDFs with the Document Viewer
 xdg-mime default org.gnome.Evince.desktop application/pdf
 
-# Use Chromium as the default browser
-xdg-settings set default-web-browser chromium.desktop
-xdg-mime default chromium.desktop x-scheme-handler/http
-xdg-mime default chromium.desktop x-scheme-handler/https
+# Set Zen Browser as default if no browser is already configured
+current_browser=$(xdg-settings get default-web-browser 2>/dev/null)
+if [[ -z "$current_browser" || "$current_browser" == "none" ]]; then
+  xdg-settings set default-web-browser zen.desktop
+  xdg-mime default zen.desktop x-scheme-handler/http
+  xdg-mime default zen.desktop x-scheme-handler/https
+fi
 
 # Open video files with mpv
 xdg-mime default mpv.desktop video/mp4
