@@ -2,19 +2,19 @@
 mkdir -p ~/.config/git
 touch ~/.config/git/config
 
-# Set common git aliases
-git config --global alias.co checkout
-git config --global alias.br branch
-git config --global alias.ci commit
-git config --global alias.st status
-git config --global pull.rebase true
-git config --global init.defaultBranch master
+# Set common git aliases only if not already set
+git config --global --get alias.co  &>/dev/null || git config --global alias.co checkout
+git config --global --get alias.br  &>/dev/null || git config --global alias.br branch
+git config --global --get alias.ci  &>/dev/null || git config --global alias.ci commit
+git config --global --get alias.st  &>/dev/null || git config --global alias.st status
+git config --global --get pull.rebase        &>/dev/null || git config --global pull.rebase true
+git config --global --get init.defaultBranch &>/dev/null || git config --global init.defaultBranch master
 
-# Set identification from install inputs
-if [[ -n "${ARCHBRIGADE_USER_NAME//[[:space:]]/}" ]]; then
-  git config --global user.name "$ARCHBRIGADE_USER_NAME"
+# Set identification only if not already configured
+if [[ -z "$(git config --global --get user.name 2>/dev/null)" ]]; then
+  [[ -n "${ARCHBRIGADE_USER_NAME//[[:space:]]/}" ]] && git config --global user.name "$ARCHBRIGADE_USER_NAME"
 fi
 
-if [[ -n "${ARCHBRIGADE_USER_EMAIL//[[:space:]]/}" ]]; then
-  git config --global user.email "$ARCHBRIGADE_USER_EMAIL"
+if [[ -z "$(git config --global --get user.email 2>/dev/null)" ]]; then
+  [[ -n "${ARCHBRIGADE_USER_EMAIL//[[:space:]]/}" ]] && git config --global user.email "$ARCHBRIGADE_USER_EMAIL"
 fi
