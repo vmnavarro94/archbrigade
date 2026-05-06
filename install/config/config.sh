@@ -11,4 +11,4 @@ if [[ -f ~/.zshrc ]]; then
   echo "Existing .zshrc backed up to ~/.zshrc.bak"
 fi
 cp ~/.local/share/archbrigade/default/zshrc ~/.zshrc
-chsh -s /bin/zsh "$USER"
+sudo usermod -s /bin/zsh "$USER"
