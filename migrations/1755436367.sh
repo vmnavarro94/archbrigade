@@ -1,6 +1,6 @@
 echo "Add minimal starship prompt to terminal"
 
-if omarchy-cmd-missing starship; then
-  omarchy-pkg-add starship
-  cp $OMARCHY_PATH/config/starship.toml ~/.config/starship.toml
+if archbrigade-cmd-missing starship; then
+  archbrigade-pkg-add starship
+  cp $ARCHBRIGADE_PATH/config/starship.toml ~/.config/starship.toml
 fi

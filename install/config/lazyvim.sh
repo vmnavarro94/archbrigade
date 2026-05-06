@@ -1,1 +1,1 @@
-omarchy-lazyvim-setup
+archbrigade-lazyvim-setup

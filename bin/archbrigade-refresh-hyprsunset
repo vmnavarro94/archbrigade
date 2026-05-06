@@ -1,0 +1,4 @@
+#!/bin/bash
+
+archbrigade-refresh-config hypr/hyprsunset.conf
+archbrigade-restart-hyprsunset

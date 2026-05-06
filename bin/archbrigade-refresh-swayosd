@@ -1,0 +1,5 @@
+#!/bin/bash
+
+archbrigade-refresh-config swayosd/config.toml
+archbrigade-refresh-config swayosd/style.css
+archbrigade-restart-swayosd

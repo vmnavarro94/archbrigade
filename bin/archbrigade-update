@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+archbrigade-snapshot create || [ $? -eq 127 ]
+archbrigade-update-git
+archbrigade-update-perform

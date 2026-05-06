@@ -1,0 +1,3 @@
+#!/bin/bash
+
+archbrigade-restart-app hypridle

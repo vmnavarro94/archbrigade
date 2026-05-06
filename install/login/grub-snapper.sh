@@ -8,7 +8,7 @@ clear
 
 # Check for GRUB installation
 if command -v grub-install &>/dev/null; then
-  echo "[Omarchy] Detected GRUB, configuring…"
+  echo "[ArchBrigade] Detected GRUB, configuring…"
 
   # --- mkinitcpio hooks ---
   HOOKS=(base udev plymouth keyboard autodetect microcode modconf kms keymap consolefont block filesystems fsck)
@@ -16,7 +16,7 @@ if command -v grub-install &>/dev/null; then
     HOOKS+=(btrfs)
   fi
 
-  sudo tee /etc/mkinitcpio.conf.d/omarchy_hooks.conf >/dev/null <<EOF
+  sudo tee /etc/mkinitcpio.conf.d/archbrigade_hooks.conf >/dev/null <<EOF
 HOOKS=(${HOOKS[*]})
 EOF
 
@@ -58,7 +58,7 @@ EOF
   sudo tee /etc/default/grub >/dev/null <<EOF
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=3
-GRUB_DISTRIBUTOR="Omarchy"
+GRUB_DISTRIBUTOR="ArchBrigade"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
 
 # Graphical console
@@ -77,15 +77,15 @@ EOF
 
   # --- Install GRUB ---
   if [[ -d /sys/firmware/efi ]]; then
-    echo "[Omarchy] Installing GRUB for EFI"
-    sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Omarchy
+    echo "[ArchBrigade] Installing GRUB for EFI"
+    sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ArchBrigade
   else
-    echo "[Omarchy] Installing GRUB for BIOS"
+    echo "[ArchBrigade] Installing GRUB for BIOS"
     sudo grub-install --target=i386-pc "$(findmnt -n -o SOURCE / | sed 's/p\?[0-9]*$//')"
   fi
 
   # --- Generate GRUB config ---
   sudo grub-mkconfig -o /boot/grub/grub.cfg
 
-  echo "[Omarchy] GRUB setup complete."
+  echo "[ArchBrigade] GRUB setup complete."
 fi

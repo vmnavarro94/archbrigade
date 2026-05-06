@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+FIRST_RUN_MODE=~/.local/state/archbrigade/first-run.mode
+
+if [[ -f "$FIRST_RUN_MODE" ]]; then
+  rm -f "$FIRST_RUN_MODE"
+
+  bash "$ARCHBRIGADE_PATH/install/first-run/battery-monitor.sh"
+  bash "$ARCHBRIGADE_PATH/install/first-run/firewall.sh"
+  bash "$ARCHBRIGADE_PATH/install/first-run/gnome-theme.sh"
+  sudo rm -f /etc/sudoers.d/first-run
+
+  bash "$ARCHBRIGADE_PATH/install/first-run/wifi.sh"
+  bash "$ARCHBRIGADE_PATH/install/first-run/welcome.sh"
+fi

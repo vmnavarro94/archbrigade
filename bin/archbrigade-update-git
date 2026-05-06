@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo -e "\e[32mUpdate ArchBrigade\e[0m"
+
+git -C $ARCHBRIGADE_PATH pull --autostash
+git -C $ARCHBRIGADE_PATH diff --check || git -C $ARCHBRIGADE_PATH reset --merge

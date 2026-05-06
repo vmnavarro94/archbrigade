@@ -1,0 +1,7 @@
+#!/bin/bash
+
+archbrigade-refresh-config hypr/autostart.conf
+archbrigade-refresh-config hypr/bindings.conf
+archbrigade-refresh-config hypr/envs.conf
+archbrigade-refresh-config hypr/input.conf
+archbrigade-refresh-config hypr/hyprland.conf

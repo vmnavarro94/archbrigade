@@ -1,5 +1,5 @@
-source ~/.local/share/omarchy/default/zsh/shell
-source ~/.local/share/omarchy/default/bash/aliases
-source ~/.local/share/omarchy/default/bash/functions
-source ~/.local/share/omarchy/default/bash/envs
-source ~/.local/share/omarchy/default/zsh/init
+source ~/.local/share/archbrigade/default/zsh/shell
+source ~/.local/share/archbrigade/default/bash/aliases
+source ~/.local/share/archbrigade/default/bash/functions
+source ~/.local/share/archbrigade/default/bash/envs
+source ~/.local/share/archbrigade/default/zsh/init

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+COMMAND="$1"
+ARCHBRIGADE_PATH=${ARCHBRIGADE_PATH:-$HOME/.local/share/archbrigade}
+
+if [[ -z $COMMAND ]]; then
+  echo "Usage: archbrigade-snapshot <create|restore>" >&2
+  exit 1
+fi
+
+if ! command -v snapper &>/dev/null; then
+  exit 127 # archbrigade-update can use this to just ignore if snapper is not available
+fi
+
+case "$COMMAND" in
+create)
+  DESC="$(archbrigade-version)"
+
+  echo -e "\e[32mCreate system snapshot\e[0m"
+  
+  # Get existing snapper config names from CSV output
+  mapfile -t CONFIGS < <(sudo snapper --csvout list-configs | awk -F, 'NR>1 {print $1}')
+
+  for config in "${CONFIGS[@]}"; do
+    sudo snapper -c "$config" create -c number -d "$DESC"
+  done
+  echo
+  ;;
+restore)
+  echo "Not able to resore like this in grubarchbrigade. Restore using snapper manually"
+  exit 1
+  ;;
+esac

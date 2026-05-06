@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cmd="$*"
+exec setsid uwsm app -- alacritty --class=ArchBrigade --title=ArchBrigade -e bash -c "archbrigade-show-logo; $cmd; archbrigade-show-done"

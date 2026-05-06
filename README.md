@@ -1,34 +1,34 @@
-# Omarchy
+# ArchBrigade
 
-Turn a fresh Arch installation into a fully-configured, beautiful, and modern web development system based on Hyprland by running a single command. That's the one-line pitch for Omarchy (like it was for Omakub). No need to write bespoke configs for every essential tool just to get started or to be up on all the latest command-line tools. Omarchy is an opinionated take on what Linux can be at its best.
+Turn a fresh Arch installation into a fully-configured, beautiful, and modern web development system based on Hyprland by running a single command. That's the one-line pitch for ArchBrigade (like it was for Omakub). No need to write bespoke configs for every essential tool just to get started or to be up on all the latest command-line tools. ArchBrigade is an opinionated take on what Linux can be at its best.
 
-Read more at [omarchy.org](https://omarchy.org).
+Read more at [archbrigade.org](https://archbrigade.org).
 
 ---
 
 # Fork Info
-This is a fork of Omarchy that uses GRUB instead of Limine, doesn't have disk encryption and, because of that, uses sddm. It also supports a flexible disk configuration.
+This is a fork of ArchBrigade that uses GRUB instead of Limine, doesn't have disk encryption and, because of that, uses sddm. It also supports a flexible disk configuration.
 
 ## Why?
 I sometimes need to dual-boot on my laptop with one nvme-slot.
 
 ## How to install
-Follow the official [manual installation guide](https://learn.omacom.io/2/the-omarchy-manual/96/manual-installation). You can ignore the disk configuration, disk encryption and bootloader parts. 
-The guide is correct apart from the last paragraph where Omarchy should prompt for name and e-mail. I had to dig through commits to fix that :).
+Follow the official [manual installation guide](https://learn.omacom.io/2/the-archbrigade-manual/96/manual-installation). You can ignore the disk configuration, disk encryption and bootloader parts. 
+The guide is correct apart from the last paragraph where ArchBrigade should prompt for name and e-mail. I had to dig through commits to fix that :).
 
-Instead of curling the omarchy install link use this command:
+Instead of curling the archbrigade install link use this command:
 ```
-curl -fsSL https://raw.githubusercontent.com/LukasKorotaj/grubomarchy/refs/heads/master/boot.sh | bash
+curl -fsSL https://raw.githubusercontent.com/LukasKorotaj/grubarchbrigade/refs/heads/master/boot.sh | bash
 ```
 
 ## Drawbacks
 * Ugly sddm screen because of theme licences, you will have to install those yourself.
 * Doesn't support encryption at all.
 
-Apart from that the core Omarchy functionality is there.
+Apart from that the core ArchBrigade functionality is there.
 
 ---
 
 ## License
 
-Omarchy is released under the [MIT License](https://opensource.org/licenses/MIT).
+ArchBrigade is released under the [MIT License](https://opensource.org/licenses/MIT).

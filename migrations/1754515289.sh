@@ -1,4 +1,4 @@
-echo "Update and restart Walker to resolve stuck Omarchy menu"
+echo "Update and restart Walker to resolve stuck ArchBrigade menu"
 
 sudo pacman -Syu --noconfirm walker-bin
-omarchy-restart-walker
+archbrigade-restart-walker

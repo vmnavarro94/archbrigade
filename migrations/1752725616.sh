@@ -8,9 +8,9 @@ if [[ -f ~/.local/share/applications/blueberry.desktop ]]; then
   gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
   gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
 
-  omarchy-refresh-waybar
+  archbrigade-refresh-waybar
 fi
 
-if [[ ! -L "~/.config/omarchy/themes/rose-pine" ]]; then
-  ln -snf ~/.local/share/omarchy/themes/rose-pine ~/.config/omarchy/themes/
+if [[ ! -L "~/.config/archbrigade/themes/rose-pine" ]]; then
+  ln -snf ~/.local/share/archbrigade/themes/rose-pine ~/.config/archbrigade/themes/
 fi

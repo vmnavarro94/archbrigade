@@ -3,16 +3,16 @@
 # Exit immediately if a command exits with a non-zero status
 set -eEo pipefail
 
-# Define Omarchy locations
-export OMARCHY_PATH="$HOME/.local/share/omarchy"
-export OMARCHY_INSTALL="$OMARCHY_PATH/install"
-export OMARCHY_INSTALL_LOG_FILE="/var/log/omarchy-install.log"
-export PATH="$OMARCHY_PATH/bin:$PATH"
+# Define ArchBrigade locations
+export ARCHBRIGADE_PATH="$HOME/.local/share/archbrigade"
+export ARCHBRIGADE_INSTALL="$ARCHBRIGADE_PATH/install"
+export ARCHBRIGADE_INSTALL_LOG_FILE="/var/log/archbrigade-install.log"
+export PATH="$ARCHBRIGADE_PATH/bin:$PATH"
 
 # Install
-source "$OMARCHY_INSTALL/helpers/all.sh"
-source "$OMARCHY_INSTALL/preflight/all.sh"
-source "$OMARCHY_INSTALL/packaging/all.sh"
-source "$OMARCHY_INSTALL/config/all.sh"
-source "$OMARCHY_INSTALL/login/all.sh"
-source "$OMARCHY_INSTALL/post-install/all.sh"
+source "$ARCHBRIGADE_INSTALL/helpers/all.sh"
+source "$ARCHBRIGADE_INSTALL/preflight/all.sh"
+source "$ARCHBRIGADE_INSTALL/packaging/all.sh"
+source "$ARCHBRIGADE_INSTALL/config/all.sh"
+source "$ARCHBRIGADE_INSTALL/login/all.sh"
+source "$ARCHBRIGADE_INSTALL/post-install/all.sh"

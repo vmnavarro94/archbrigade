@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+archbrigade-update-available-reset
+archbrigade-update-system-pkgs
+archbrigade-migrate
+archbrigade-update-restart

@@ -1,3 +1,3 @@
-echo "Copy Omarchy default app icons to .local/share/icons"
+echo "Copy ArchBrigade default app icons to .local/share/icons"
 
-source $OMARCHY_PATH/install/packaging/icons.sh
+source $ARCHBRIGADE_PATH/install/packaging/icons.sh

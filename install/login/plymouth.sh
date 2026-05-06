@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# Omarchy SDDM + Plymouth Setup (for non-encrypted disks)
+# ArchBrigade SDDM + Plymouth Setup (for non-encrypted disks)
 # ==============================================================================
 
 # ------------------------------
 # 1. Plymouth theme setup
 # ------------------------------
-PLYMOUTH_THEME="omarchy"
+PLYMOUTH_THEME="archbrigade"
 
 if [ "$(plymouth-set-default-theme)" != "$PLYMOUTH_THEME" ]; then
-    sudo cp -r "$HOME/.local/share/omarchy/default/plymouth" "/usr/share/plymouth/themes/$PLYMOUTH_THEME/"
+    sudo cp -r "$HOME/.local/share/archbrigade/default/plymouth" "/usr/share/plymouth/themes/$PLYMOUTH_THEME/"
     sudo plymouth-set-default-theme "$PLYMOUTH_THEME"
     sudo mkinitcpio -P
     echo "Plymouth theme set to $PLYMOUTH_THEME."
@@ -31,7 +31,7 @@ echo "SDDM enabled and set as default graphical target."
 # 3. Remove any previous auto-login config
 # ------------------------------
 SDDM_CONF_DIR="/etc/sddm.conf.d"
-AUTO_CONF="$SDDM_CONF_DIR/omarchy-autologin.conf"
+AUTO_CONF="$SDDM_CONF_DIR/archbrigade-autologin.conf"
 
 if [ -f "$AUTO_CONF" ]; then
     sudo rm "$AUTO_CONF"
