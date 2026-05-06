@@ -16,8 +16,12 @@ if command -v grub-install &>/dev/null; then
     HOOKS+=(btrfs)
   fi
 
+  # Preserve existing MODULES (e.g. nvidia modules) from current config
+  EXISTING_MODULES=$(grep "^MODULES=" /etc/mkinitcpio.conf 2>/dev/null | sed 's/MODULES=(\(.*\))/\1/' || true)
+
   sudo tee /etc/mkinitcpio.conf.d/archbrigade_hooks.conf >/dev/null <<EOF
 HOOKS=(${HOOKS[*]})
+$([ -n "$EXISTING_MODULES" ] && echo "MODULES=($EXISTING_MODULES)")
 EOF
 
   # --- Install required packages ---
