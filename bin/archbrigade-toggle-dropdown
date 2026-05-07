@@ -9,7 +9,7 @@ TERMINAL_CLASS="archbrigade-dropdown"
 
 WIDTH_PERCENT=80
 HEIGHT_PERCENT=40
-Y_OFFSET=2  # pixels from top (after waybar)
+Y_OFFSET=26  # waybar height (reserved space)
 
 get_monitor_info() {
   hyprctl monitors -j | jq -r '.[] | select(.focused == true) | "\(.x) \(.y) \(.width) \(.height) \(.scale) \(.name)"'
@@ -32,24 +32,30 @@ calculate_position() {
 
 animate_slide_down() {
   local addr="$1" tx="$2" ty="$3" w="$4" h="$5"
-  local steps=6
+  local steps=10
   local start_y=$(( ty - h ))
   for i in $(seq 1 $steps); do
-    local cy=$(( start_y + (ty - start_y) * i / steps ))
+    # Ease out: decelerate towards end
+    local t=$(echo "scale=4; $i / $steps" | bc)
+    local ease=$(echo "scale=4; 1 - (1 - $t) * (1 - $t)" | bc)
+    local cy=$(echo "scale=0; $start_y + ($ty - $start_y) * $ease / 1" | bc)
     hyprctl dispatch movewindowpixel "exact $tx $cy,address:$addr" >/dev/null 2>&1
-    sleep 0.025
+    sleep 0.02
   done
   hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr" >/dev/null 2>&1
 }
 
 animate_slide_up() {
   local addr="$1" sx="$2" sy="$3" h="$4"
-  local steps=6
+  local steps=10
   local end_y=$(( sy - h ))
   for i in $(seq 1 $steps); do
-    local cy=$(( sy + (end_y - sy) * i / steps ))
+    # Ease in: accelerate
+    local t=$(echo "scale=4; $i / $steps" | bc)
+    local ease=$(echo "scale=4; $t * $t" | bc)
+    local cy=$(echo "scale=0; $sy + ($end_y - $sy) * $ease / 1" | bc)
     hyprctl dispatch movewindowpixel "exact $sx $cy,address:$addr" >/dev/null 2>&1
-    sleep 0.025
+    sleep 0.02
   done
 }
 
