@@ -1,3 +1,4 @@
+run_logged $ARCHBRIGADE_INSTALL/config/cleanup-old-configs.sh
 run_logged $ARCHBRIGADE_INSTALL/config/config.sh
 run_logged $ARCHBRIGADE_INSTALL/config/elephant.sh
 run_logged $ARCHBRIGADE_INSTALL/config/theme.sh
