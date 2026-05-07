@@ -2,6 +2,10 @@
 mkdir -p ~/.config
 cp -R ~/.local/share/archbrigade/config/* ~/.config/
 
+# Quickshell overview config
+mkdir -p ~/.config/quickshell
+cp -R ~/.local/share/archbrigade/config/quickshell/* ~/.config/quickshell/
+
 # Walker config needs actual home path (doesn't expand ~ or $HOME)
 sed -i "s|\$HOME|$HOME|g" ~/.config/walker/config.toml
 
