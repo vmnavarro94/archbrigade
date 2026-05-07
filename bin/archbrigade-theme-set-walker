@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Generate walker theme CSS from current archbrigade theme colors
+WALKER_THEME_DIR="$HOME/.local/share/archbrigade/default/walker/themes/archbrigade"
+THEME_CSS="$HOME/.config/archbrigade/current/theme/walker.css"
+DEFAULT_CSS="/etc/xdg/walker/themes/default/style.css"
+OUTPUT="$WALKER_THEME_DIR/style.css"
+
+mkdir -p "$WALKER_THEME_DIR"
+
+# Link XML files from default if missing
+for f in /etc/xdg/walker/themes/default/*.xml; do
+  [[ -L "$WALKER_THEME_DIR/$(basename $f)" ]] || ln -sf "$f" "$WALKER_THEME_DIR/"
+done
+
+# Build CSS: theme colors + default styles
+{
+  [[ -f "$THEME_CSS" ]] && cat "$THEME_CSS"
+  echo ""
+  # Remap archbrigade color vars to walker default var names
+  echo "@define-color window_bg_color @base;"
+  echo "@define-color accent_bg_color @border;"
+  echo "@define-color theme_fg_color @text;"
+  echo ""
+  # Include default styles (skip the default color definitions)
+  grep -v "^@define-color" "$DEFAULT_CSS"
+} > "$OUTPUT"
+
+# Restart walker to apply new theme
+pkill walker 2>/dev/null
+sleep 0.5
+uwsm app -- walker --gapplication-service &>/dev/null &

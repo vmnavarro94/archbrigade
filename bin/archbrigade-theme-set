@@ -36,6 +36,7 @@ archbrigade-theme-set-gnome
 archbrigade-theme-set-eza
 archbrigade-theme-set-browser
 archbrigade-theme-set-vscode
+archbrigade-theme-set-walker
 
 # Helix editor theme (if installed)
 if command -v hx &>/dev/null; then
