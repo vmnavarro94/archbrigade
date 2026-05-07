@@ -1,80 +1,48 @@
 #!/usr/bin/env bash
-# Dropdown terminal - pin permanently, toggle via off-screen position
+# Dropdown terminal - simple special workspace toggle
 
 ADDR_FILE="/tmp/archbrigade_dropdown_addr"
 WIDTH_PERCENT=80
 HEIGHT_PERCENT=55
-SLIDE_STEPS=16
-SLIDE_DELAY=0.012
 
 get_pos() {
-  local info=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | "\(.width) \(.height)"')
-  local mw=$(echo $info | awk '{print $1}')
-  local mh=$(echo $info | awk '{print $2}')
+  local info=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | "\(.x) \(.width) \(.height)"')
+  local mx=$(echo $info | awk '{print $1}')
+  local mw=$(echo $info | awk '{print $2}')
+  local mh=$(echo $info | awk '{print $3}')
   local w=$(( mw * WIDTH_PERCENT / 100 ))
   local h=$(( mh * HEIGHT_PERCENT / 100 ))
-  local x=$(( (mw - w) / 2 ))
+  local x=$(( mx + (mw - w) / 2 ))
   echo "$x 26 $w $h"
 }
 
 get_addr() { [[ -f "$ADDR_FILE" ]] && cat "$ADDR_FILE"; }
 
-is_visible() {
-  local a=$(get_addr)
-  [[ -n "$a" ]] || return 1
-  local y=$(hyprctl clients -j | jq --arg a "$a" '.[] | select(.address==$a) | .at[1]')
-  [[ -n "$y" ]] && (( y >= -100 && y < 2000 ))
-}
-
-slide_down() {
-  local addr=$1 tx=$2 ty=$3 th=$4
-  local sy=$(( -th ))
-  local range=$(( ty - sy ))
-  hyprctl dispatch movewindowpixel "exact $tx $sy,address:$addr" >/dev/null 2>&1
-  sleep 0.05
-  for i in $(seq 1 $SLIDE_STEPS); do
-    local cy=$(( sy + range * i / SLIDE_STEPS ))
-    hyprctl dispatch movewindowpixel "exact $tx $cy,address:$addr" >/dev/null 2>&1
-    sleep $SLIDE_DELAY
-  done
-  hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr" >/dev/null 2>&1
-}
-
-slide_up() {
-  local addr=$1 sx=$2 sy=$3 th=$4
-  local ey=$(( -th ))
-  local range=$(( sy - ey ))
-  for i in $(seq 1 $SLIDE_STEPS); do
-    local cy=$(( sy - range * i / SLIDE_STEPS ))
-    hyprctl dispatch movewindowpixel "exact $sx $cy,address:$addr" >/dev/null 2>&1
-    sleep $SLIDE_DELAY
-  done
-  hyprctl dispatch movewindowpixel "exact $sx -10000,address:$addr" >/dev/null 2>&1
-}
-
+addr=$(get_addr)
 pos=$(get_pos)
 tx=$(echo $pos | awk '{print $1}')
 ty=$(echo $pos | awk '{print $2}')
 tw=$(echo $pos | awk '{print $3}')
 th=$(echo $pos | awk '{print $4}')
 
-addr=$(get_addr)
-
+# Check if terminal exists
 if [[ -z "$addr" ]] || ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .address==$a)' >/dev/null 2>&1; then
-  # Spawn new - start off-screen, pin, then slide down
-  hyprctl dispatch exec "[float; size $tw $th] kitty --class archbrigade-dropdown"
-  sleep 0.5
+  hyprctl dispatch exec "[float; size $tw $th; workspace special:dropdown silent] kitty --class archbrigade-dropdown"
+  sleep 0.4
   addr=$(hyprctl clients -j | jq -r --arg c "archbrigade-dropdown" '[.[] | select(.class==$c)] | last | .address')
   echo "$addr" > "$ADDR_FILE"
-  hyprctl dispatch pin "address:$addr"
-  hyprctl dispatch movewindowpixel "exact $tx -10000,address:$addr"
+fi
+
+# Toggle visibility
+ws=$(hyprctl clients -j | jq -r --arg a "$addr" '.[] | select(.address==$a) | .workspace.name')
+if [[ "$ws" == "special:dropdown" ]]; then
+  hyprctl dispatch togglespecialworkspace dropdown
   sleep 0.1
-  slide_down "$addr" "$tx" "$ty" "$th"
-  hyprctl dispatch focuswindow "address:$addr"
-elif is_visible; then
-  slide_up "$addr" "$tx" "$ty" "$th"
-else
+  hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr"
   hyprctl dispatch resizewindowpixel "exact $tw $th,address:$addr"
-  slide_down "$addr" "$tx" "$ty" "$th"
   hyprctl dispatch focuswindow "address:$addr"
+else
+  hyprctl dispatch movewindowpixel "exact $tx $(( -th )),address:$addr"
+  sleep 0.05
+  hyprctl dispatch togglespecialworkspace dropdown
 fi
