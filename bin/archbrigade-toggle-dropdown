@@ -33,5 +33,10 @@ if [[ -z "$addr" ]] || ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .a
   hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr" >/dev/null 2>&1
 fi
 
-hyprctl dispatch togglespecialworkspace dropdown
-hyprctl dispatch focuswindow "address:$addr"
+ws=$(hyprctl clients -j | jq -r --arg a "$addr" '.[] | select(.address==$a) | .workspace.name')
+if [[ "$ws" == "special:dropdown" ]]; then
+  hyprctl dispatch togglespecialworkspace dropdown
+  hyprctl dispatch focuswindow "address:$addr"
+else
+  hyprctl dispatch togglespecialworkspace dropdown
+fi
