@@ -1,7 +1,7 @@
 # Remove old HyprBrigade/HyDE configs and packages that conflict with ArchBrigade
 
 # Remove HyprBrigade packages if installed
-HYPRBRIGADE_PKGS=(rofi nwg-look nwg-displays awww wlogout swww hyprshot waybar-hyprland dunst swaylock hyprpaper wofi thunar thunar-archive-plugin thunar-volman mousepad vim vim-runtime alacritty)
+HYPRBRIGADE_PKGS=(quickshell-git rofi nwg-look nwg-displays awww wlogout swww hyprshot waybar-hyprland dunst swaylock hyprpaper wofi thunar thunar-archive-plugin thunar-volman mousepad vim vim-runtime alacritty)
 for pkg in "${HYPRBRIGADE_PKGS[@]}"; do
   if pacman -Q "$pkg" &>/dev/null; then
     echo "Removing HyprBrigade package: $pkg"
