@@ -1,4 +1,5 @@
 run_logged $ARCHBRIGADE_INSTALL/config/config.sh
+run_logged $ARCHBRIGADE_INSTALL/config/elephant.sh
 run_logged $ARCHBRIGADE_INSTALL/config/theme.sh
 run_logged $ARCHBRIGADE_INSTALL/config/branding.sh
 run_logged $ARCHBRIGADE_INSTALL/config/git.sh
