@@ -1,34 +1,54 @@
 # ArchBrigade
 
-Turn a fresh Arch installation into a fully-configured, beautiful, and modern web development system based on Hyprland by running a single command. That's the one-line pitch for ArchBrigade (like it was for Omakub). No need to write bespoke configs for every essential tool just to get started or to be up on all the latest command-line tools. ArchBrigade is an opinionated take on what Linux can be at its best.
+Turn a fresh Arch Linux installation into a fully-configured, beautiful, and productive development environment with a single command.
 
-Read more at [archbrigade.org](https://archbrigade.org).
+ArchBrigade is a fork of [Omarchy](https://github.com/basecamp/omarchy) (by DHH/37signals) customized for everyday use. It replaces Limine with GRUB, removes mandatory disk encryption, uses SDDM instead of auto-login, and swaps several apps for better alternatives.
 
----
+## What's different from Omarchy
 
-# Fork Info
-This is a fork of ArchBrigade that uses GRUB instead of Limine, doesn't have disk encryption and, because of that, uses sddm. It also supports a flexible disk configuration.
+- **GRUB** instead of Limine — supports dual-boot and no-encryption setups
+- **SDDM** login manager instead of auto-login
+- **No mandatory disk encryption** — works on any Arch install
+- **Bitwarden + rbw** instead of 1Password
+- **Zen Browser** instead of Chromium
+- **Kitty** as default terminal (with tabs)
+- **ZSH** with autosuggestions, syntax highlighting, and pokemon-colorscripts
+- **Quickshell workspace overview** (`SUPER+A`)
+- **Dropdown terminal** (`SUPER+SHIFT+RETURN`)
+- Cleaned up webapps — removed 37signals-specific apps
 
-## Why?
-I sometimes need to dual-boot on my laptop with one nvme-slot.
+## Installation
 
-## How to install
-Follow the official [manual installation guide](https://learn.omacom.io/2/the-archbrigade-manual/96/manual-installation). You can ignore the disk configuration, disk encryption and bootloader parts. 
-The guide is correct apart from the last paragraph where ArchBrigade should prompt for name and e-mail. I had to dig through commits to fix that :).
+Requires a fresh Arch Linux install (no desktop environment). Then run:
 
-Instead of curling the archbrigade install link use this command:
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/vmnavarro94/archbrigade/master/boot.sh)
 ```
-curl -fsSL https://raw.githubusercontent.com/LukasKorotaj/grubarchbrigade/refs/heads/master/boot.sh | bash
-```
 
-## Drawbacks
-* Ugly sddm screen because of theme licences, you will have to install those yourself.
-* Doesn't support encryption at all.
+The installer will ask about your filesystem (Btrfs or not) and set everything up automatically.
 
-Apart from that the core ArchBrigade functionality is there.
+## Key bindings
 
----
+| Shortcut | Action |
+|----------|--------|
+| `SUPER+Space` | App launcher |
+| `SUPER+Return` | Terminal (kitty) |
+| `SUPER+SHIFT+Return` | Dropdown terminal |
+| `SUPER+A` | Workspace overview |
+| `SUPER+E` | File manager |
+| `SUPER+B` | Browser |
+| `SUPER+/` | Bitwarden |
+| `SUPER+C/X/V` | Universal copy/cut/paste |
+| `SUPER+CTRL+V` | Clipboard history |
+| `SUPER+SHIFT+S` | Screenshot region |
+| `SUPER+SHIFT+R` | Screen record with audio |
+| `SUPER+K` | Keybindings cheatsheet |
+| `SUPER+SHIFT+CTRL+Space` | Change theme |
+
+## Credits
+
+Based on [Omarchy](https://github.com/basecamp/omarchy) by DHH/37signals, and [grubomarchy](https://github.com/LukasKorotaj/grubomarchy) by LukasKorotaj.
 
 ## License
 
-ArchBrigade is released under the [MIT License](https://opensource.org/licenses/MIT).
+MIT
