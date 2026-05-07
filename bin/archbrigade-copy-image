@@ -1,0 +1,2 @@
+#!/bin/bash
+wl-copy --type image/png
