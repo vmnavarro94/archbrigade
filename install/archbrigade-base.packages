@@ -3,7 +3,7 @@
 
 bitwarden
 rbw
-alacritty
+kitty
 avahi
 bash-completion
 bat
@@ -32,7 +32,7 @@ fzf
 github-cli
 grub
 grub-btrfs
-gnome-calculator
+qalculate-gtk
 gnome-keyring
 gnome-themes-extra
 gum
