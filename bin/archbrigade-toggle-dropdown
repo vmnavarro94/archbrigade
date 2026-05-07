@@ -33,14 +33,15 @@ if [[ -z "$addr" ]] || ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .a
   hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr" >/dev/null 2>&1
 fi
 
-# Check if special:dropdown is currently visible
-active_special=$(hyprctl activespecialworkspace 2>/dev/null | grep "name:" | grep "dropdown" || true)
-if [[ -z "$active_special" ]]; then
+# Check if special:dropdown is currently visible on focused monitor
+mon_id=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .id')
+is_visible=$(hyprctl workspaces -j | jq -r --arg m "$mon_id" '.[] | select(.name=="special:dropdown") | .monitorID' 2>/dev/null)
+if [[ "$is_visible" == "$mon_id" ]]; then
+  # Visible on this monitor - hide it
+  hyprctl dispatch togglespecialworkspace dropdown
+else
   # Hidden - show it
   hyprctl dispatch togglespecialworkspace dropdown
   sleep 0.05
   hyprctl dispatch focuswindow "address:$addr"
-else
-  # Visible - hide it
-  hyprctl dispatch togglespecialworkspace dropdown
 fi
