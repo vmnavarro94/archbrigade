@@ -1,5 +1,13 @@
-# Remove old HyprBrigade/HyDE configs that conflict with ArchBrigade
-# Only remove known conflicting dirs/files, preserve user-specific ones
+# Remove old HyprBrigade/HyDE configs and packages that conflict with ArchBrigade
+
+# Remove HyprBrigade packages if installed
+HYPRBRIGADE_PKGS=(rofi nwg-look nwg-displays awww wlogout swww hyprshot waybar-hyprland dunst swaylock hyprpaper wofi)
+for pkg in "${HYPRBRIGADE_PKGS[@]}"; do
+  if pacman -Q "$pkg" &>/dev/null; then
+    echo "Removing HyprBrigade package: $pkg"
+    sudo pacman -R --noconfirm "$pkg" 2>/dev/null || true
+  fi
+done
 
 # Waybar - replace entirely with ArchBrigade
 rm -rf ~/.config/waybar
@@ -15,8 +23,19 @@ rm -rf ~/.config/hypr/animations
 rm -rf ~/.config/hypr/Monitor_Profiles
 rm -rf ~/.config/hypr/scripts
 rm -rf ~/.config/hypr/UserScripts
+rm -rf ~/.config/hypr/themes
+rm -rf ~/.config/hypr/rofi
 rm -f ~/.config/hypr/application-style.conf
 rm -f ~/.config/hypr/HyprBrigade-v1.0.0
 rm -f ~/.config/hypr/workspaces.conf
 rm -f ~/.config/hypr/initial-boot.sh
 rm -f ~/.config/hypr/.initial_startup_done
+
+# Remove HyprBrigade rofi config
+rm -rf ~/.config/rofi
+
+# Remove old notification daemon configs (using mako)
+rm -rf ~/.config/dunst
+
+# Remove old lock screen configs (using hyprlock)
+rm -rf ~/.config/swaylock
