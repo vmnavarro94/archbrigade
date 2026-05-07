@@ -10,6 +10,14 @@ fi
 
 SCOPE="${1:-region}"
 
+# Direct stop command (called from toggle script)
+if [[ "$SCOPE" == "stop" ]]; then
+  pkill -x wf-recorder
+  notify-send "Screen recording saved to $OUTPUT_DIR" -t 2000
+  pkill -RTMIN+8 waybar
+  exit 0
+fi
+
 toggle_screenrecording_indicator() {
   pkill -RTMIN+8 waybar
 }

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# If recording active: stop it directly. Otherwise open selector UI.
+if pgrep -x wf-recorder >/dev/null; then
+  archbrigade-cmd-screenrecord stop
+else
+  uwsm app -- kitty --class archbrigade-screenrecord --title "Screen Record" -e archbrigade-cmd-screenrecord
+fi
