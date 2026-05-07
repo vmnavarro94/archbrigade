@@ -25,13 +25,7 @@ menu() {
 
   read -r -a args <<<"$extra"
 
-  if [[ -n "$preselect" ]]; then
-    local index
-    index=$(echo -e "$options" | grep -nxF "$preselect" | cut -d: -f1)
-    if [[ -n "$index" ]]; then
-      args+=("-a" "$index")
-    fi
-  fi
+  # preselect not supported by walker dmenu
 
   echo -e "$options" | walker --dmenu --theme dmenu_250 -p "$prompt…" "${args[@]}"
 }
