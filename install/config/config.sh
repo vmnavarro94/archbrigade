@@ -10,11 +10,15 @@ cp ~/.local/share/archbrigade/default/bashrc ~/.bashrc
 
 # Use default zshrc from ArchBrigade and set zsh as default shell
 if [[ -f ~/.zshrc ]]; then
-  # Only backup once - preserve original, not subsequent installs
-  if [[ ! -f ~/.zshrc.bak ]]; then
-    cp ~/.zshrc ~/.zshrc.bak
-    echo "Existing .zshrc backed up to ~/.zshrc.bak"
-  fi
+  ZSHRC_BAK=~/.zshrc.pre-archbrigade-$(date +%Y%m%d-%H%M%S)
+  cp ~/.zshrc "$ZSHRC_BAK"
+  echo ""
+  echo "╔══════════════════════════════════════════════════════╗"
+  echo "║  Your existing .zshrc has been backed up to:        ║"
+  echo "║  $ZSHRC_BAK"
+  echo "║  Your aliases, exports and customizations are safe. ║"
+  echo "╚══════════════════════════════════════════════════════╝"
+  echo ""
 fi
 cp ~/.local/share/archbrigade/default/zshrc ~/.zshrc
 sudo usermod -s /bin/zsh "$USER"
