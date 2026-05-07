@@ -36,3 +36,19 @@ archbrigade-theme-set-gnome
 archbrigade-theme-set-eza
 archbrigade-theme-set-browser
 archbrigade-theme-set-vscode
+
+# Helix editor theme (if installed)
+if command -v hx &>/dev/null; then
+  HELIX_THEME=$(cat ~/.config/archbrigade/current/theme/helix.txt 2>/dev/null)
+  if [[ -n "$HELIX_THEME" ]]; then
+    mkdir -p ~/.config/helix
+    python3 -c "
+import tomllib, tomli_w, pathlib, sys
+p = pathlib.Path('$HOME/.config/helix/config.toml')
+config = tomllib.loads(p.read_text()) if p.exists() else {}
+config.setdefault('theme', '$HELIX_THEME')
+config['theme'] = '$HELIX_THEME'
+p.write_text(tomli_w.dumps(config))
+" 2>/dev/null || sed -i \"s/^theme = .*/theme = \\\"$HELIX_THEME\\\"/\" ~/.config/helix/config.toml 2>/dev/null
+  fi
+fi

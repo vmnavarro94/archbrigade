@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Capture a screen region and extract text via OCR, copying result to clipboard
+REGION=$(slurp) || exit 0
+grim -g "$REGION" - | tesseract stdin stdout 2>/dev/null | wl-copy
+notify-send "Text extracted" "Copied to clipboard" -t 2000

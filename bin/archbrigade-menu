@@ -299,10 +299,14 @@ show_install_ai_menu() {
 }
 
 show_install_gaming_menu() {
-  case $(menu "Install" "  Steam\n  RetroArch [AUR]\n󰍳  Minecraft") in
+  case $(menu "Install" "  Steam\n  RetroArch [AUR]\n󰍳  Minecraft\n  Lutris [AUR]\n  Heroic (Epic) [AUR]\n  Moonlight [AUR]\n  Xbox Cloud Gaming") in
   *Steam*) present_terminal archbrigade-install-steam ;;
   *RetroArch*) aur_install_and_launch "RetroArch" "retroarch retroarch-assets libretro libretro-fbneo" "com.libretro.RetroArch.desktop" ;;
   *Minecraft*) aur_install_and_launch "Minecraft [AUR]" "minecraft-launcher" "minecraft-launcher" ;;
+  *Lutris*) aur_install_and_launch "Lutris" "lutris" "lutris" ;;
+  *Heroic*) aur_install_and_launch "Heroic Launcher" "heroic-games-launcher-bin" "com.heroicgameslauncher.hgl" ;;
+  *Moonlight*) aur_install_and_launch "Moonlight" "moonlight-qt" "moonlight" ;;
+  *Xbox*) archbrigade-webapp-install "Xbox Cloud Gaming" "https://www.xbox.com/en-US/play" "Xbox.png" ;;
   *) show_install_menu ;;
   esac
 }
