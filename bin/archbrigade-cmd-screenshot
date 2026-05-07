@@ -14,11 +14,24 @@ pkill slurp 2>/dev/null && exit 0
 TMPFILE=$(mktemp /tmp/screenshot-XXXXXX.png)
 trap 'rm -f "$TMPFILE"' EXIT
 
-hyprshot -m ${1:-region} --raw > "$TMPFILE"
+MODE=${1:-region}
 
-# Verify capture succeeded
+case "$MODE" in
+  region)
+    REGION=$(slurp) || exit 0
+    grim -g "$REGION" "$TMPFILE"
+    ;;
+  window)
+    REGION=$(hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
+    grim -g "$REGION" "$TMPFILE"
+    ;;
+  output)
+    grim "$TMPFILE"
+    ;;
+esac
+
 if [[ ! -s "$TMPFILE" ]]; then
-  notify-send "Screenshot failed or cancelled" -t 2000
+  notify-send "Screenshot failed" -t 2000
   exit 1
 fi
 
