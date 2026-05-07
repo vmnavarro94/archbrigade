@@ -2,7 +2,7 @@ close_when_open = true
 theme = "archbrigade-default"
 theme_base = []
 theme_location = ["~/.local/share/archbrigade/default/walker/themes/"]
-hotreload_theme = true
+hotreload_theme = false
 force_keyboard_focus = true
 timeout = 60
 
