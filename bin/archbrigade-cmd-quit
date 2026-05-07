@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Quit app: sends Ctrl+Q, but Ctrl+Shift+Q for terminals
-ACTIVE_CLASS=$(hyprctl activewindow -j 2>/dev/null | jq -r '.class // ""')
-TERMINALS="Alacritty|kitty|com.mitchellh.ghostty|foot"
-
-if echo "$ACTIVE_CLASS" | grep -qiE "($TERMINALS)"; then
-  wtype -M ctrl -M shift -k q -m shift -m ctrl
-else
-  wtype -M ctrl -k q -m ctrl
-fi
+# Kill active window's process entirely
+PID=$(hyprctl activewindow -j 2>/dev/null | jq -r '.pid // empty')
+[[ -n "$PID" ]] && kill "$PID"
