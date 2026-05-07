@@ -27,7 +27,7 @@ menu() {
 
   # preselect not supported by walker dmenu
 
-  echo -e "$options" | walker --dmenu --theme dmenu_250 -p "$prompt…" "${args[@]}"
+  echo -e "$options" | walker --dmenu --theme dmenu_250 -p "$prompt…" "${args[@]}" 2>/dev/null
 }
 
 terminal() {
