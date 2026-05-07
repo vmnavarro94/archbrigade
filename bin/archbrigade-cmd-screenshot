@@ -8,10 +8,17 @@ if [[ ! -d "$OUTPUT_DIR" ]]; then
   exit 1
 fi
 
-pkill slurp || hyprshot -m ${1:-region} --raw |
-  satty --filename - \
-    --output-filename "$OUTPUT_DIR/screenshot-$(date +'%Y-%m-%d_%H-%M-%S').png" \
-    --early-exit \
-    --actions-on-enter save-to-clipboard \
-    --save-after-copy \
-    --copy-command 'wl-copy'
+# Kill any existing selection
+pkill slurp 2>/dev/null && exit 0
+
+TMPFILE=$(mktemp /tmp/screenshot-XXXXXX.png)
+trap 'rm -f "$TMPFILE"' EXIT
+
+hyprshot -m ${1:-region} --raw > "$TMPFILE" || exit 1
+
+satty --filename "$TMPFILE" \
+  --output-filename "$OUTPUT_DIR/screenshot-$(date +'%Y-%m-%d_%H-%M-%S').png" \
+  --early-exit \
+  --actions-on-enter save-to-clipboard \
+  --save-after-copy \
+  --copy-command 'wl-copy'
