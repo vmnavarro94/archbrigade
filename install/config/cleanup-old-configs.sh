@@ -46,6 +46,7 @@ for f in thunar.desktop thunar-bulk-rename.desktop thunar-settings.desktop thuna
           org.xfce.mousepad.desktop org.xfce.mousepad-settings.desktop \
           rofi.desktop rofi-theme-selector.desktop vim.desktop nvim.desktop \
           bssh.desktop bvnc.desktop avahi-discover.desktop cmake-gui.desktop \
-          electron34.desktop fcitx5-configtool.desktop cups.desktop btop.desktop; do
+          electron34.desktop fcitx5-configtool.desktop cups.desktop btop.desktop \
+          Alacritty.desktop org.gnome.Calculator.desktop nautilus-autorun-software.desktop; do
   echo -e "[Desktop Entry]\nHidden=true\nNoDisplay=true" > ~/.local/share/applications/$f
 done
