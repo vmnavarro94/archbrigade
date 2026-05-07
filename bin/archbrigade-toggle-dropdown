@@ -22,12 +22,16 @@ get_window_geometry() {
 
 animate_slide_down() {
   local addr="$1" target_x="$2" target_y="$3" width="$4" height="$5"
-  local start_y=$(( target_y - height - 50 ))
-  local step_y=$(( (target_y - start_y) / SLIDE_STEPS ))
-  hyprctl dispatch movewindowpixel "exact $target_x $start_y,address:$addr" >/dev/null 2>&1
-  sleep 0.05
+  # Start from y=0 (behind waybar), slide to target_y
+  local start_y=0
+  local step_y=$(( (target_y - start_y + height) / SLIDE_STEPS ))
+  # Position window above screen so only top edge visible at waybar
+  hyprctl dispatch movewindowpixel "exact $target_x $(( start_y - height )),address:$addr" >/dev/null 2>&1
+  sleep 0.03
   for i in $(seq 1 $SLIDE_STEPS); do
-    local current_y=$(( start_y + (step_y * i) ))
+    # Ease out: slow down at end
+    local ease=$(( i * (2 * SLIDE_STEPS - i) / SLIDE_STEPS ))
+    local current_y=$(( -height + ease * (target_y + height) / SLIDE_STEPS ))
     hyprctl dispatch movewindowpixel "exact $target_x $current_y,address:$addr" >/dev/null 2>&1
     sleep $SLIDE_DELAY
   done
