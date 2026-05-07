@@ -8,22 +8,22 @@
   border-radius: 0;
   min-height: 0;
   font-family: CaskaydiaMono Nerd Font;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .modules-left {
-  margin-left: 8px;
+  margin-left: 12px;
 }
 
 .modules-right {
-  margin-right: 8px;
+  margin-right: 12px;
 }
 
 #workspaces button {
   all: initial;
-  padding: 0 6px;
-  margin: 0 1.5px;
-  min-width: 9px;
+  padding: 0 10px;
+  margin: 0 2px;
+  min-width: 12px;
 }
 
 #workspaces button.empty {
@@ -39,24 +39,24 @@
 #custom-archbrigade,
 #custom-screenrecording-indicator,
 #custom-update {
-  min-width: 12px;
-  margin: 0 7.5px;
+  min-width: 14px;
+  margin: 0 10px;
 }
 
 #custom-expand-icon {
-  margin-right: 7px;
+  margin-right: 10px;
 }
 
 tooltip {
-  padding: 2px;
+  padding: 4px;
 }
 
 #custom-update {
-  font-size: 10px;
+  font-size: 13px;
 }
 
 #clock {
-  margin-left: 8.75px;
+  margin-left: 12px;
 }
 
 .hidden {
@@ -64,9 +64,9 @@ tooltip {
 }
 
 #custom-screenrecording-indicator {
-  min-width: 12px;
-  margin-left: 8.75px;
-  font-size: 10px;
+  min-width: 14px;
+  margin-left: 12px;
+  font-size: 13px;
 }
 
 #custom-screenrecording-indicator.active {
