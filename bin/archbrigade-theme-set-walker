@@ -4,7 +4,7 @@
 WALKER_THEME_DIR="$HOME/.local/share/archbrigade/default/walker/themes/archbrigade"
 THEME_CSS="$HOME/.config/archbrigade/current/theme/walker.css"
 DEFAULT_CSS="/etc/xdg/walker/themes/default/style.css"
-OUTPUT="$WALKER_THEME_DIR/style.css"
+OUTPUT="$HOME/.local/share/archbrigade/default/walker/themes/archbrigade.css"
 
 mkdir -p "$WALKER_THEME_DIR"
 
