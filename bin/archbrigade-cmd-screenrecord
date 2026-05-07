@@ -10,20 +10,13 @@ fi
 
 SCOPE="${1:-region}"
 
-# Direct stop command (called from toggle script)
-if [[ "$SCOPE" == "stop" ]]; then
-  pkill -x wf-recorder
-  notify-send "Screen recording saved to $OUTPUT_DIR" -t 2000
-  pkill -RTMIN+8 waybar
-  exit 0
-fi
+# Selects audio inclusion or not
+AUDIO=$([[ $2 == "audio" ]] && echo "--audio")
 
-toggle_screenrecording_indicator() {
-  pkill -RTMIN+8 waybar
-}
-
-screenrecording_active() {
-  pgrep -x wf-recorder >/dev/null
+start_screenrecording() {
+  local filename="$OUTPUT_DIR/screenrecording-$(date +'%Y-%m-%d_%H-%M-%S').mp4"
+  wf-recorder $AUDIO -f "$filename" -c libx264 -p crf=23 -p preset=medium -p movflags=+faststart "$@" &
+  toggle_screenrecording_indicator
 }
 
 stop_screenrecording() {
@@ -33,55 +26,20 @@ stop_screenrecording() {
   toggle_screenrecording_indicator
 }
 
+toggle_screenrecording_indicator() {
+  pkill -RTMIN+8 waybar
+}
+
+screenrecording_active() {
+  pgrep -x wf-recorder >/dev/null
+}
+
 if screenrecording_active; then
   stop_screenrecording
-  exit 0
-fi
-
-# Audio selection
-AUDIO_CHOICE=$(gum choose --header "Audio source?" "No audio" "Desktop audio" "Microphone" "Desktop + Microphone")
-[[ -z "$AUDIO_CHOICE" ]] && exit 0
-
-AUDIO_FLAGS=()
-COMBINED_MODULE=""
-
-case "$AUDIO_CHOICE" in
-  "Desktop audio")
-    AUDIO_FLAGS=(--audio)
-    ;;
-  "Microphone")
-    MIC=$(pactl list sources short | grep -v monitor | awk '{print $2}' | gum choose --header "Select microphone:")
-    [[ -z "$MIC" ]] && exit 0
-    AUDIO_FLAGS=(--audio="$MIC")
-    ;;
-  "Desktop + Microphone")
-    MIC=$(pactl list sources short | grep -v monitor | awk '{print $2}' | gum choose --header "Select microphone:")
-    [[ -z "$MIC" ]] && exit 0
-    COMBINED_MODULE=$(pactl load-module module-null-sink sink_name=archbrigade_recording_mix)
-    pactl load-module module-loopback source=@DEFAULT_SOURCE@ sink=archbrigade_recording_mix 2>/dev/null
-    pactl load-module module-loopback source="$MIC" sink=archbrigade_recording_mix 2>/dev/null
-    AUDIO_FLAGS=(--audio="archbrigade_recording_mix.monitor")
-    ;;
-esac
-
-# Region/output selection
-filename="$OUTPUT_DIR/screenrecording-$(date +'%Y-%m-%d_%H-%M-%S').mp4"
-
-if [[ "$SCOPE" == "output" ]]; then
-  geometry=$(slurp -o) || exit 0
+elif [[ "$SCOPE" == "output" ]]; then
+  output=$(slurp -o) || exit 1
+  start_screenrecording -g "$output"
 else
-  geometry=$(slurp) || exit 0
-fi
-
-notify-send "Screen recording started" "Press SUPER+SHIFT+R to stop" -t 2000
-
-wf-recorder "${AUDIO_FLAGS[@]}" -g "$geometry" -f "$filename" \
-  -c libx264 -p crf=23 -p preset=medium -p movflags=+faststart &
-
-toggle_screenrecording_indicator
-
-# Wait for recording to finish then cleanup combined source
-if [[ -n "$COMBINED_MODULE" ]]; then
-  wait
-  pactl unload-module "$COMBINED_MODULE" 2>/dev/null
+  region=$(slurp) || exit 1
+  start_screenrecording -g "$region"
 fi
