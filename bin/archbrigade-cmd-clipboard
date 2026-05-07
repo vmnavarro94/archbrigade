@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Unified clipboard: sends correct copy/cut/paste for terminals vs other apps
+# Usage: archbrigade-cmd-clipboard [copy|cut|paste]
+
+ACTION="${1:-copy}"
+
+# Get active window class
+ACTIVE_CLASS=$(hyprctl activewindow -j 2>/dev/null | jq -r '.class // ""')
+
+# Check if active window is a terminal
+TERMINALS="Alacritty|kitty|com.mitchellh.ghostty|foot|xterm|rxvt|Termite|wezterm"
+
+if echo "$ACTIVE_CLASS" | grep -qiE "($TERMINALS)"; then
+  # Terminal: use Ctrl+Shift+C/X/V
+  case "$ACTION" in
+    copy)  wtype -M ctrl -M shift -k c -m shift -m ctrl ;;
+    cut)   wtype -M ctrl -M shift -k x -m shift -m ctrl ;;
+    paste) wtype -M ctrl -M shift -k v -m shift -m ctrl ;;
+  esac
+else
+  # Other apps: use Ctrl+C/X/V
+  case "$ACTION" in
+    copy)  wtype -M ctrl -k c -m ctrl ;;
+    cut)   wtype -M ctrl -k x -m ctrl ;;
+    paste) wtype -M ctrl -k v -m ctrl ;;
+  esac
+fi
