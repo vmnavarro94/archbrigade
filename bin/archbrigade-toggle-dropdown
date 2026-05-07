@@ -1,92 +1,167 @@
 #!/usr/bin/env bash
+# /* ---- Dropdown Terminal for ArchBrigade ---- */
+# Adapted from JaKooLit/SherLock707
 
-# Dropdown terminal with manual slide animation
-SPECIAL_WS="special:dropdown"
-ADDR_FILE="/tmp/archbrigade_dropdown_addr"
-TERMINAL_CLASS="archbrigade-dropdown"
+DEBUG=false
+SPECIAL_WS="special:scratchpad"
+ADDR_FILE="/tmp/dropdown_terminal_addr"
+
 WIDTH_PERCENT=80
 HEIGHT_PERCENT=55
-Y_OFFSET=26  # waybar height
+Y_PERCENT=2
 
-get_pos() {
-  local info=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | "\(.width) \(.height)"')
-  local mw=$(echo $info | awk '{print $1}')
-  local mh=$(echo $info | awk '{print $2}')
-  local w=$(( mw * WIDTH_PERCENT / 100 ))
-  local h=$(( mh * HEIGHT_PERCENT / 100 ))
-  local x=$(( (mw - w) / 2 ))
-  echo "$x $Y_OFFSET $w $h"
+SLIDE_STEPS=6
+SLIDE_DELAY=0.025
+
+debug_echo() { [ "$DEBUG" = true ] && echo "$@"; }
+
+get_window_geometry() {
+  local addr="$1"
+  hyprctl clients -j | jq -r --arg ADDR "$addr" '.[] | select(.address == $ADDR) | "\(.at[0]) \(.at[1]) \(.size[0]) \(.size[1])"'
 }
 
-slide_down() {
-  local addr=$1 tx=$2 ty=$3 w=$4 h=$5
-  local steps=14
-  local sy=$(( ty - h ))
-  for i in $(seq 1 $steps); do
-    # ease out cubic
-    local inv=$(( steps - i ))
-    local cy=$(( ty - h * inv * inv * inv / steps / steps / steps ))
-    hyprctl dispatch movewindowpixel "exact $tx $cy,address:$addr" >/dev/null 2>&1
-    sleep 0.014
-  done
-  hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr" >/dev/null 2>&1
-}
-
-slide_up() {
-  local addr=$1 sx=$2 sy=$3 h=$4
-  local steps=10
-  local ey=$(( sy - h ))
-  for i in $(seq 1 $steps); do
-    # ease in cubic
-    local cy=$(( sy + (ey - sy) * i * i * i / steps / steps / steps ))
-    hyprctl dispatch movewindowpixel "exact $sx $cy,address:$addr" >/dev/null 2>&1
-    sleep 0.014
-  done
-}
-
-get_addr() { [[ -f "$ADDR_FILE" ]] && cat "$ADDR_FILE"; }
-
-exists() {
-  local a=$(get_addr)
-  [[ -n "$a" ]] && hyprctl clients -j | jq -e --arg a "$a" 'any(.[]; .address == $a)' >/dev/null 2>&1
-}
-
-is_visible() {
-  local a=$(get_addr)
-  [[ -n "$a" ]] && hyprctl clients -j | jq -e --arg a "$a" 'any(.[]; .address == $a and .workspace.name != "special:dropdown")' >/dev/null 2>&1
-}
-
-pos=$(get_pos)
-tx=$(echo $pos | awk '{print $1}')
-ty=$(echo $pos | awk '{print $2}')
-tw=$(echo $pos | awk '{print $3}')
-th=$(echo $pos | awk '{print $4}')
-cur_ws=$(hyprctl activeworkspace -j | jq -r '.id')
-
-if ! exists; then
-  hyprctl dispatch exec "[float; size $tw $th; workspace $SPECIAL_WS silent] kitty --class $TERMINAL_CLASS"
-  sleep 0.4
-  addr=$(hyprctl clients -j | jq -r --arg c "$TERMINAL_CLASS" '[.[] | select(.class == $c)] | last | .address')
-  echo "$addr" > "$ADDR_FILE"
-  hyprctl dispatch movetoworkspacesilent "$cur_ws,address:$addr"
-  hyprctl dispatch pin "address:$addr"
-  slide_down "$addr" "$tx" "$ty" "$tw" "$th"
-  hyprctl dispatch focuswindow "address:$addr"
-elif is_visible; then
-  addr=$(get_addr)
-  geo=$(hyprctl clients -j | jq -r --arg a "$addr" '.[] | select(.address == $a) | "\(.at[0]) \(.at[1]) \(.size[1])"')
-  sx=$(echo $geo | awk '{print $1}')
-  sy=$(echo $geo | awk '{print $2}')
-  sh=$(echo $geo | awk '{print $3}')
-  slide_up "$addr" "$sx" "$sy" "$sh"
+animate_slide_down() {
+  local addr="$1" target_x="$2" target_y="$3" width="$4" height="$5"
+  local start_y=$(( target_y - height - 50 ))
+  local step_y=$(( (target_y - start_y) / SLIDE_STEPS ))
+  hyprctl dispatch movewindowpixel "exact $target_x $start_y,address:$addr" >/dev/null 2>&1
   sleep 0.05
-  hyprctl dispatch pin "address:$addr"
-  hyprctl dispatch movetoworkspacesilent "$SPECIAL_WS,address:$addr"
+  for i in $(seq 1 $SLIDE_STEPS); do
+    local current_y=$(( start_y + (step_y * i) ))
+    hyprctl dispatch movewindowpixel "exact $target_x $current_y,address:$addr" >/dev/null 2>&1
+    sleep $SLIDE_DELAY
+  done
+  hyprctl dispatch movewindowpixel "exact $target_x $target_y,address:$addr" >/dev/null 2>&1
+}
+
+animate_slide_up() {
+  local addr="$1" start_x="$2" start_y="$3" width="$4" height="$5"
+  local end_y=$(( start_y - height - 50 ))
+  local step_y=$(( (start_y - end_y) / SLIDE_STEPS ))
+  for i in $(seq 1 $SLIDE_STEPS); do
+    local current_y=$(( start_y - (step_y * i) ))
+    hyprctl dispatch movewindowpixel "exact $start_x $current_y,address:$addr" >/dev/null 2>&1
+    sleep $SLIDE_DELAY
+  done
+}
+
+get_monitor_info() {
+  hyprctl monitors -j | jq -r '.[] | select(.focused == true) | "\(.x) \(.y) \(.width) \(.height) \(.scale) \(.name)"'
+}
+
+calculate_dropdown_position() {
+  local monitor_info=$(get_monitor_info)
+  local mon_x=$(echo $monitor_info | awk '{print $1}')
+  local mon_y=$(echo $monitor_info | awk '{print $2}')
+  local mon_width=$(echo $monitor_info | awk '{print $3}')
+  local mon_height=$(echo $monitor_info | awk '{print $4}')
+  local mon_name=$(echo $monitor_info | awk '{print $6}')
+
+  local width=$(( mon_width * WIDTH_PERCENT / 100 ))
+  local height=$(( mon_height * HEIGHT_PERCENT / 100 ))
+  local y_offset=$(( mon_height * Y_PERCENT / 100 + 26 ))
+  local x_offset=$(( (mon_width - width) / 2 ))
+  local final_x=$(( mon_x + x_offset ))
+  local final_y=$(( mon_y + y_offset ))
+
+  echo "$final_x $final_y $width $height $mon_name"
+}
+
+get_terminal_address() {
+  [ -f "$ADDR_FILE" ] && [ -s "$ADDR_FILE" ] && cut -d' ' -f1 "$ADDR_FILE"
+}
+
+get_terminal_monitor() {
+  [ -f "$ADDR_FILE" ] && [ -s "$ADDR_FILE" ] && cut -d' ' -f2- "$ADDR_FILE"
+}
+
+terminal_exists() {
+  local addr=$(get_terminal_address)
+  [ -n "$addr" ] && hyprctl clients -j | jq -e --arg ADDR "$addr" 'any(.[]; .address == $ADDR)' >/dev/null 2>&1
+}
+
+terminal_in_special() {
+  local addr=$(get_terminal_address)
+  [ -n "$addr" ] && hyprctl clients -j | jq -e --arg ADDR "$addr" 'any(.[]; .address == $ADDR and .workspace.name == "special:scratchpad")' >/dev/null 2>&1
+}
+
+spawn_terminal() {
+  local pos_info=$(calculate_dropdown_position)
+  local target_x=$(echo $pos_info | awk '{print $1}')
+  local target_y=$(echo $pos_info | awk '{print $2}')
+  local width=$(echo $pos_info | awk '{print $3}')
+  local height=$(echo $pos_info | awk '{print $4}')
+  local monitor_name=$(echo $pos_info | awk '{print $5}')
+
+  local windows_before=$(hyprctl clients -j)
+  hyprctl dispatch exec "[float; size $width $height; workspace special:scratchpad silent] kitty --class archbrigade-dropdown"
+  sleep 0.2
+
+  local windows_after=$(hyprctl clients -j)
+  local new_addr=$(comm -13 \
+    <(echo "$windows_before" | jq -r '.[].address' | sort) \
+    <(echo "$windows_after" | jq -r '.[].address' | sort) | head -1)
+
+  [ -z "$new_addr" ] && new_addr=$(hyprctl clients -j | jq -r 'sort_by(.focusHistoryID) | .[-1] | .address')
+
+  if [ -n "$new_addr" ] && [ "$new_addr" != "null" ]; then
+    echo "$new_addr $monitor_name" > "$ADDR_FILE"
+    sleep 0.2
+    local CURRENT_WS=$(hyprctl activeworkspace -j | jq -r '.id')
+    hyprctl dispatch movetoworkspacesilent "$CURRENT_WS,address:$new_addr"
+    hyprctl dispatch pin "address:$new_addr"
+    animate_slide_down "$new_addr" "$target_x" "$target_y" "$width" "$height"
+    return 0
+  fi
+  return 1
+}
+
+CURRENT_WS=$(hyprctl activeworkspace -j | jq -r '.id')
+
+if terminal_exists; then
+  TERMINAL_ADDR=$(get_terminal_address)
+  focused_monitor=$(get_monitor_info | awk '{print $6}')
+  dropdown_monitor=$(get_terminal_monitor)
+
+  if [ "$focused_monitor" != "$dropdown_monitor" ]; then
+    pos_info=$(calculate_dropdown_position)
+    target_x=$(echo $pos_info | awk '{print $1}')
+    target_y=$(echo $pos_info | awk '{print $2}')
+    width=$(echo $pos_info | awk '{print $3}')
+    height=$(echo $pos_info | awk '{print $4}')
+    monitor_name=$(echo $pos_info | awk '{print $5}')
+    hyprctl dispatch movewindowpixel "exact $target_x $target_y,address:$TERMINAL_ADDR"
+    hyprctl dispatch resizewindowpixel "exact $width $height,address:$TERMINAL_ADDR"
+    echo "$TERMINAL_ADDR $monitor_name" > "$ADDR_FILE"
+  fi
+
+  if terminal_in_special; then
+    pos_info=$(calculate_dropdown_position)
+    target_x=$(echo $pos_info | awk '{print $1}')
+    target_y=$(echo $pos_info | awk '{print $2}')
+    width=$(echo $pos_info | awk '{print $3}')
+    height=$(echo $pos_info | awk '{print $4}')
+    hyprctl dispatch movetoworkspacesilent "$CURRENT_WS,address:$TERMINAL_ADDR"
+    hyprctl dispatch pin "address:$TERMINAL_ADDR"
+    hyprctl dispatch resizewindowpixel "exact $width $height,address:$TERMINAL_ADDR"
+    animate_slide_down "$TERMINAL_ADDR" "$target_x" "$target_y" "$width" "$height"
+    hyprctl dispatch focuswindow "address:$TERMINAL_ADDR"
+  else
+    geometry=$(get_window_geometry "$TERMINAL_ADDR")
+    if [ -n "$geometry" ]; then
+      curr_x=$(echo $geometry | awk '{print $1}')
+      curr_y=$(echo $geometry | awk '{print $2}')
+      curr_width=$(echo $geometry | awk '{print $3}')
+      curr_height=$(echo $geometry | awk '{print $4}')
+      animate_slide_up "$TERMINAL_ADDR" "$curr_x" "$curr_y" "$curr_width" "$curr_height"
+      sleep 0.1
+      hyprctl dispatch pin "address:$TERMINAL_ADDR"
+      hyprctl dispatch movetoworkspacesilent "$SPECIAL_WS,address:$TERMINAL_ADDR"
+    else
+      hyprctl dispatch pin "address:$TERMINAL_ADDR"
+      hyprctl dispatch movetoworkspacesilent "$SPECIAL_WS,address:$TERMINAL_ADDR"
+    fi
+  fi
 else
-  addr=$(get_addr)
-  hyprctl dispatch movetoworkspacesilent "$cur_ws,address:$addr"
-  hyprctl dispatch pin "address:$addr"
-  hyprctl dispatch resizewindowpixel "exact $tw $th,address:$addr"
-  slide_down "$addr" "$tx" "$ty" "$tw" "$th"
-  hyprctl dispatch focuswindow "address:$addr"
+  spawn_terminal && hyprctl dispatch focuswindow "address:$(get_terminal_address)"
 fi
