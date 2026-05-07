@@ -40,4 +40,4 @@ uwsm app -- satty --filename "$TMPFILE" \
   --early-exit \
   --actions-on-enter save-to-clipboard \
   --save-after-copy \
-  --copy-command 'wl-copy'
+  --copy-command 'wl-copy --type image/png'
