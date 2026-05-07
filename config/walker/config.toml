@@ -28,7 +28,7 @@ context_aware = false
 show_sub_when_single = false
 history = false
 icon = ""
-hidden = true
+hidden = false
 
 [builtins.applications.actions]
 enabled = false
