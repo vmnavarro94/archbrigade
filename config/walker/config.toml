@@ -60,10 +60,16 @@ hidden = true
 [builtins.clipboard]
 hidden = true
 
-# Elephant clipboard provider (shows history from elephant service)
-[[providers]]
-provider = "clipboard"
+[providers]
+default = ["desktopapplications", "calc", "websearch"]
+empty = ["desktopapplications"]
+
+[providers.clipboard]
 time_format = "relative"
+
+[[providers.prefixes]]
+prefix = ":"
+provider = "clipboard"
 
 [builtins.commands]
 hidden = true
