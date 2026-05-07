@@ -26,10 +26,11 @@ tw=$(echo $pos | awk '{print $3}')
 th=$(echo $pos | awk '{print $4}')
 
 if [[ -z "$addr" ]] || ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .address==$a)' >/dev/null 2>&1; then
-  hyprctl dispatch exec "[float; size $tw $th; move $tx $ty; workspace special:dropdown silent] kitty --class archbrigade-dropdown"
+  hyprctl dispatch exec "[float; size $tw $th; workspace special:dropdown silent] kitty --class archbrigade-dropdown"
   sleep 0.4
   addr=$(hyprctl clients -j | jq -r --arg c "archbrigade-dropdown" '[.[] | select(.class==$c)] | last | .address')
   echo "$addr" > "$ADDR_FILE"
+  hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr" >/dev/null 2>&1
 fi
 
 hyprctl dispatch togglespecialworkspace dropdown
