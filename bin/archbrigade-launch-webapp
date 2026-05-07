@@ -1,10 +1,19 @@
 #!/bin/bash
 
 browser=$(xdg-settings get default-web-browser)
+browser_exec=$(sed -n 's/^Exec=\([^ ]*\).*/\1/p' {~/.local,~/.nix-profile,/usr}/share/applications/$browser 2>/dev/null | head -1)
 
+# Chromium-based: use --app flag for proper PWA experience
+# Firefox-based (zen, firefox, librewolf): use --new-window
 case $browser in
-google-chrome* | brave-browser* | microsoft-edge* | opera* | vivaldi* | helium-browser*) ;;
-*) browser="chromium.desktop" ;;
+zen* | firefox* | librewolf* | org.mozilla*)
+  exec setsid uwsm app -- "$browser_exec" --new-window "$1" "${@:2}"
+  ;;
+google-chrome* | brave-browser* | microsoft-edge* | opera* | vivaldi* | chromium*)
+  exec setsid uwsm app -- "$browser_exec" --app="$1" "${@:2}"
+  ;;
+*)
+  # Fallback: try --app, some browsers support it
+  exec setsid uwsm app -- "$browser_exec" --app="$1" "${@:2}"
+  ;;
 esac
-
-exec setsid uwsm app -- $(sed -n 's/^Exec=\([^ ]*\).*/\1/p' {~/.local,~/.nix-profile,/usr}/share/applications/$browser 2>/dev/null | head -1) --app="$1" "${@:2}"
