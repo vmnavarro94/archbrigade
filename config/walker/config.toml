@@ -1,5 +1,5 @@
 close_when_open = true
-theme = "omarchy-default"
+theme = "default"
 theme_base = []
 theme_location = ["$HOME/.local/share/archbrigade/default/walker/themes/"]
 hotreload_theme = false
