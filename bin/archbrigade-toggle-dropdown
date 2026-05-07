@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Dropdown terminal - simple special workspace toggle
+# Dropdown terminal - position BEFORE toggle, let Hyprland animate
 
 ADDR_FILE="/tmp/archbrigade_dropdown_addr"
 WIDTH_PERCENT=80
@@ -25,7 +25,7 @@ ty=$(echo $pos | awk '{print $2}')
 tw=$(echo $pos | awk '{print $3}')
 th=$(echo $pos | awk '{print $4}')
 
-# Check if terminal exists
+# Check terminal exists
 if [[ -z "$addr" ]] || ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .address==$a)' >/dev/null 2>&1; then
   hyprctl dispatch exec "[float; size $tw $th; workspace special:dropdown silent] kitty --class archbrigade-dropdown"
   sleep 0.4
@@ -33,16 +33,16 @@ if [[ -z "$addr" ]] || ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .a
   echo "$addr" > "$ADDR_FILE"
 fi
 
-# Toggle visibility
 ws=$(hyprctl clients -j | jq -r --arg a "$addr" '.[] | select(.address==$a) | .workspace.name')
+
 if [[ "$ws" == "special:dropdown" ]]; then
+  # Position correctly WHILE hidden, then toggle to show
+  hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr" >/dev/null 2>&1
+  hyprctl dispatch resizewindowpixel "exact $tw $th,address:$addr" >/dev/null 2>&1
+  sleep 0.05
   hyprctl dispatch togglespecialworkspace dropdown
-  sleep 0.1
-  hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr"
-  hyprctl dispatch resizewindowpixel "exact $tw $th,address:$addr"
   hyprctl dispatch focuswindow "address:$addr"
 else
-  hyprctl dispatch movewindowpixel "exact $tx $(( -th )),address:$addr"
-  sleep 0.05
+  # Hide
   hyprctl dispatch togglespecialworkspace dropdown
 fi
