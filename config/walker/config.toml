@@ -63,8 +63,6 @@ hidden = true
 # Elephant clipboard provider (shows history from elephant service)
 [[providers]]
 provider = "clipboard"
-
-[providers.clipboard]
 time_format = "relative"
 
 [builtins.commands]
