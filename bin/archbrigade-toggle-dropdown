@@ -110,6 +110,7 @@ spawn_terminal() {
     local CURRENT_WS=$(hyprctl activeworkspace -j | jq -r '.id')
     hyprctl dispatch movetoworkspacesilent "$CURRENT_WS,address:$new_addr"
     hyprctl dispatch pin "address:$new_addr"
+    sleep 0.15
     animate_slide_down "$new_addr" "$target_x" "$target_y" "$width" "$height"
     return 0
   fi
@@ -144,6 +145,7 @@ if terminal_exists; then
     hyprctl dispatch movetoworkspacesilent "$CURRENT_WS,address:$TERMINAL_ADDR"
     hyprctl dispatch pin "address:$TERMINAL_ADDR"
     hyprctl dispatch resizewindowpixel "exact $width $height,address:$TERMINAL_ADDR"
+    sleep 0.15
     animate_slide_down "$TERMINAL_ADDR" "$target_x" "$target_y" "$width" "$height"
     hyprctl dispatch focuswindow "address:$TERMINAL_ADDR"
   else
