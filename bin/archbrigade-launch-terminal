@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cwd=$(archbrigade-cmd-terminal-cwd 2>/dev/null)
-terminal=${TERMINAL:-alacritty}
+terminal=${TERMINAL:-kitty}
 
 if [[ -n "$cwd" && -d "$cwd" ]]; then
   exec uwsm app -- "$terminal" --working-directory "$cwd"
