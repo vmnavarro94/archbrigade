@@ -2,6 +2,9 @@
 mkdir -p ~/.config
 cp -R ~/.local/share/archbrigade/config/* ~/.config/
 
+# Walker config needs actual home path (doesn't expand ~ or $HOME)
+sed -i "s|\\\$HOME|$HOME|g" ~/.config/walker/config.toml
+
 # Use default bashrc from ArchBrigade
 cp ~/.local/share/archbrigade/default/bashrc ~/.bashrc
 
