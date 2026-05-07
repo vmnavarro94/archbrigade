@@ -4,10 +4,8 @@ if command -v yay &>/dev/null; then
 fi
 
 echo "Bootstrapping yay from AUR..."
-cd /tmp
-rm -rf yay-bootstrap
-git clone https://aur.archlinux.org/yay.git yay-bootstrap
-cd yay-bootstrap
+TEMP_DIR=$(mktemp -d)
+trap "rm -rf '$TEMP_DIR'" EXIT
+git clone https://aur.archlinux.org/yay.git "$TEMP_DIR/yay"
+cd "$TEMP_DIR/yay"
 makepkg -si --noconfirm
-cd /tmp
-rm -rf yay-bootstrap

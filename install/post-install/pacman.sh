@@ -2,7 +2,7 @@
 sudo cp -f ~/.local/share/archbrigade/default/pacman/pacman.conf /etc/pacman.conf
 sudo cp -f ~/.local/share/archbrigade/default/pacman/mirrorlist /etc/pacman.d/mirrorlist
 
-if lspci -nn | grep -q "106b:180[12]"; then
+if lspci -nn | grep -q "106b:180[12]" && ! grep -q "^\[arch-mact2\]" /etc/pacman.conf; then
   cat <<EOF | sudo tee -a /etc/pacman.conf >/dev/null
 
 [arch-mact2]
