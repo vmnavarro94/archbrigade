@@ -1,2 +1,2 @@
-elephant service enable
+elephant-all service enable
 systemctl --user start elephant
