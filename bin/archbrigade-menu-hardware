@@ -1,0 +1,23 @@
+#!/bin/bash
+
+CHOICE=$(gum choose --header "Hardware" \
+  "WiFi" \
+  "Bluetooth" \
+  "Audio output" \
+  "Battery status" \
+  "Toggle touchpad" \
+  "Toggle nightlight" \
+  "Toggle idle lock")
+
+case "$CHOICE" in
+  *"WiFi"*)      archbrigade-launch-wifi ;;
+  *"Bluetooth"*) uwsm app -- bluetui ;;
+  *"Audio"*)     archbrigade-cmd-audio-switch ;;
+  *"Battery"*)
+    BATTERY=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1)
+    STATUS=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -1)
+    notify-send "Battery" "${BATTERY}% — ${STATUS}" -t 3000 ;;
+  *"touchpad"*)  archbrigade-toggle-touchpad 2>/dev/null || notify-send "No touchpad toggle available" ;;
+  *"nightlight"*) archbrigade-toggle-nightlight ;;
+  *"idle"*)      archbrigade-toggle-idle ;;
+esac

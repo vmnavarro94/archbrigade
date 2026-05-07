@@ -1,0 +1,27 @@
+#!/bin/bash
+
+CHOICE=$(gum choose --header "Capture" \
+  "Screenshot — Region" \
+  "Screenshot — Window" \
+  "Screenshot — Display" \
+  "Screen Record — Region (audio)" \
+  "Screen Record — Display" \
+  "Extract Text (OCR)" \
+  "Color Picker")
+
+case "$CHOICE" in
+  *"Region"*"Screenshot"*|"Screenshot — Region")
+    archbrigade-cmd-screenshot region ;;
+  *"Window"*)
+    archbrigade-cmd-screenshot window ;;
+  *"Display"*"Screenshot"*|"Screenshot — Display")
+    archbrigade-cmd-screenshot output ;;
+  *"Record"*"Region"*)
+    archbrigade-cmd-screenrecord region audio ;;
+  *"Record"*"Display"*)
+    archbrigade-cmd-screenrecord output audio ;;
+  *"OCR"*|*"Text"*)
+    archbrigade-cmd-text-extraction ;;
+  *"Color"*)
+    pkill hyprpicker || hyprpicker -a ;;
+esac
