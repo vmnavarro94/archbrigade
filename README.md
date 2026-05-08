@@ -45,6 +45,44 @@ The installer will ask about your filesystem (Btrfs or not) and set everything u
 | `SUPER+K` | Keybindings cheatsheet |
 | `SUPER+SHIFT+CTRL+Space` | Change theme |
 
+## Shell prompt
+
+ArchBrigade uses [agnosterzak](https://github.com/zakaziko99/agnosterzak-ohmyzsh-theme), a Powerline-style oh-my-zsh theme. The prompt shows:
+
+- **Line 1:** `[error X]` → `[date/time]` → `[current directory]` → `[git branch]`
+- **Line 2:** `[@username]` + prompt character
+
+### Customizing colors
+
+Colors are defined in `~/.oh-my-zsh/themes/agnosterzak.zsh-theme`. Each segment uses `prompt_segment '<bg-hex>' '<fg-hex>' "content"`.
+
+| Function | Segment | Default bg | Default fg |
+|----------|---------|------------|------------|
+| `prompt_time` | Date/time | `#1a1b26` | `#c0caf5` |
+| `prompt_dir` | Directory | `#7dcfff` | `#1a1b26` |
+| `prompt_context` | `@username` | `#e0af68` | `#1a1b26` |
+| `prompt_status` | Error indicator | `#1a1b26` | red |
+
+To change a color, edit the relevant function. Example — make directory segment green:
+
+```zsh
+# in prompt_dir():
+prompt_segment '#9ece6a' '#1a1b26' "%B%~%b"
+```
+
+After editing, reload with `source ~/.zshrc` or open a new terminal.
+
+### Changing date format
+
+In `prompt_time()`, edit the `%D{...}` format string:
+
+```zsh
+prompt_segment '#1a1b26' '#c0caf5' "%B%D{%a %d %b - %H:%M}%b"
+#                                          strftime format ^^^
+```
+
+Common tokens: `%a` = weekday, `%d` = day, `%b` = month, `%H:%M` = 24h time.
+
 ## Credits
 
 Based on [Omarchy](https://github.com/basecamp/omarchy) by DHH/37signals, and [grubomarchy](https://github.com/LukasKorotaj/grubomarchy) by LukasKorotaj.
