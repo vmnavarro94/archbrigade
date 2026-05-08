@@ -45,6 +45,23 @@ The installer will ask about your filesystem (Btrfs or not) and set everything u
 | `SUPER+K` | Keybindings cheatsheet |
 | `SUPER+SHIFT+CTRL+Space` | Change theme |
 
+### Adding custom key bindings
+
+Edit `~/archbrigade/config/hypr/bindings.conf`. Use `bindd` (not `bind`) so the binding shows up in the `SUPER+K` cheat sheet:
+
+```ini
+# bindd = MODIFIERS, KEY, Description (shown in cheat sheet), exec, command
+bindd = SUPER, F, Firefox, exec, uwsm app -- firefox
+bindd = SUPER SHIFT, F, Firefox (private), exec, uwsm app -- firefox --private-window
+```
+
+After saving, reload Hyprland config with `SUPER+SHIFT+C` or log out and back in. The binding will appear in the cheat sheet automatically — no extra steps needed.
+
+**Tips:**
+- `SUPER SHIFT`, `SUPER CTRL`, `SUPER ALT` are valid modifier combos
+- To override a default binding, add `unbind = MODIFIERS, KEY` before your new `bindd`
+- Use `archbrigade-launch-or-focus AppName "command"` to toggle focus instead of always launching
+
 ## Shell prompt
 
 ArchBrigade uses [agnosterzak](https://github.com/zakaziko99/agnosterzak-ohmyzsh-theme), a Powerline-style oh-my-zsh theme. The prompt shows:
