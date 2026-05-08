@@ -2,14 +2,14 @@ echo "Fix Discord screen sharing on Wayland"
 
 DESKTOP_FILE="$HOME/.local/share/applications/discord.desktop"
 
-if command -v discord &>/dev/null; then
-  cat > "$DESKTOP_FILE" << 'EOF'
+if command -v discord &>/dev/null && [[ -x "$HOME/.local/bin/discord" ]]; then
+  cat > "$DESKTOP_FILE" << EOF
 [Desktop Entry]
 Name=Discord
 StartupWMClass=discord
 Comment=All-in-one voice and text chat for gamers that's free, secure, and works on both your desktop and phone.
 GenericName=Internet Messenger
-Exec=env ELECTRON_OZONE_PLATFORM_HINT=wayland /usr/bin/discord --enable-features=WebRTCPipeWireCapturer --disable-features=WebRTCPipeWireCaptureDmaBuf --ozone-platform=wayland
+Exec=$HOME/.local/bin/discord
 Icon=discord
 Type=Application
 Categories=Network;InstantMessaging;
