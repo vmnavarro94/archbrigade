@@ -9,7 +9,7 @@ Name=Discord
 StartupWMClass=discord
 Comment=All-in-one voice and text chat for gamers that's free, secure, and works on both your desktop and phone.
 GenericName=Internet Messenger
-Exec=env ELECTRON_OZONE_PLATFORM_HINT=wayland /usr/share/discord/Discord --enable-features=WebRTCPipeWireCapturer --ozone-platform=wayland --use-angle=vulkan --ignore-gpu-blocklist --enable-gpu-rasterization
+Exec=env ELECTRON_OZONE_PLATFORM_HINT=wayland /usr/bin/discord --enable-features=WebRTCPipeWireCapturer --ozone-platform=wayland --use-angle=vulkan --ignore-gpu-blocklist --enable-gpu-rasterization
 Icon=discord
 Type=Application
 Categories=Network;InstantMessaging;
