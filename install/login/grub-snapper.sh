@@ -93,17 +93,20 @@ GRUB_DISABLE_OS_PROBER=false
 GRUB_COLOR_NORMAL="light-cyan/black"
 EOF
 
-  # --- Install GRUB ---
-  if [[ -d /sys/firmware/efi ]]; then
+  # --- Install GRUB (skip if already installed and working) ---
+  if [[ -f /boot/grub/grub.cfg ]]; then
+    echo "[ArchBrigade] GRUB already installed, updating config only"
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+  elif [[ -d /sys/firmware/efi ]]; then
     echo "[ArchBrigade] Installing GRUB for EFI"
-    sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ArchBrigade
+    sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ArchBrigade || echo "[ArchBrigade] GRUB EFI install failed, skipping"
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
   else
     echo "[ArchBrigade] Installing GRUB for BIOS"
-    sudo grub-install --target=i386-pc "$(findmnt -n -o SOURCE / | sed 's/p\?[0-9]*$//')"
+    DISK=$(findmnt -n -o SOURCE / | sed 's/p\?[0-9]*$//')
+    sudo grub-install --target=i386-pc "$DISK" || echo "[ArchBrigade] GRUB BIOS install failed, skipping"
+    sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
   fi
-
-  # --- Generate GRUB config ---
-  sudo grub-mkconfig -o /boot/grub/grub.cfg
 
   echo "[ArchBrigade] GRUB setup complete."
 fi
