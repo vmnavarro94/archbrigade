@@ -1,47 +1,58 @@
 #!/usr/bin/env bash
-# Dropdown terminal - simple show/hide, no animation
+# Dropdown terminal - pinned float toggled by moving on/off screen.
+# Using pin instead of special:dropdown prevents new windows from being
+# trapped in the special workspace and allows clicking through to background windows.
 
 ADDR_FILE="/tmp/archbrigade_dropdown_addr"
 WIDTH_PERCENT=80
 HEIGHT_PERCENT=55
 
-get_pos() {
-  local info=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | "\(.x) \(.width) \(.height)"')
-  local mx=$(echo $info | awk '{print $1}')
-  local mw=$(echo $info | awk '{print $2}')
-  local mh=$(echo $info | awk '{print $3}')
-  local w=$(( mw * WIDTH_PERCENT / 100 ))
-  local h=$(( mh * HEIGHT_PERCENT / 100 ))
-  local x=$(( mx + (mw - w) / 2 ))
+get_geometry() {
+  local info
+  info=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | "\(.x) \(.width) \(.height)"')
+  local mx mw mh w h x
+  mx=$(echo "$info" | awk '{print $1}')
+  mw=$(echo "$info" | awk '{print $2}')
+  mh=$(echo "$info" | awk '{print $3}')
+  w=$(( mw * WIDTH_PERCENT / 100 ))
+  h=$(( mh * HEIGHT_PERCENT / 100 ))
+  x=$(( mx + (mw - w) / 2 ))
   echo "$x 26 $w $h"
 }
 
 get_addr() { [[ -f "$ADDR_FILE" ]] && cat "$ADDR_FILE"; }
 
 addr=$(get_addr)
-pos=$(get_pos)
-tx=$(echo $pos | awk '{print $1}')
-ty=$(echo $pos | awk '{print $2}')
-tw=$(echo $pos | awk '{print $3}')
-th=$(echo $pos | awk '{print $4}')
+pos=$(get_geometry)
+tx=$(echo "$pos" | awk '{print $1}')
+ty=$(echo "$pos" | awk '{print $2}')
+tw=$(echo "$pos" | awk '{print $3}')
+th=$(echo "$pos" | awk '{print $4}')
 
-if [[ -z "$addr" ]] || ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .address==$a)' >/dev/null 2>&1; then
-  hyprctl dispatch exec "[float; size $tw $th; workspace special:dropdown silent] kitty --class archbrigade-dropdown"
+# Invalidate stale address
+if [[ -n "$addr" ]] && ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .address==$a)' >/dev/null 2>&1; then
+  addr=""
+  rm -f "$ADDR_FILE"
+fi
+
+# Spawn hidden above screen if not running
+if [[ -z "$addr" ]]; then
+  hyprctl dispatch exec "[float; pin; size $tw $th; move exact $tx -${th}; nofocus] kitty --class archbrigade-dropdown"
   sleep 0.4
   addr=$(hyprctl clients -j | jq -r --arg c "archbrigade-dropdown" '[.[] | select(.class==$c)] | last | .address')
   echo "$addr" > "$ADDR_FILE"
-  hyprctl dispatch movewindowpixel "exact $tx $ty,address:$addr" >/dev/null 2>&1
+  # Freshly spawned above screen → fall through to show logic
 fi
 
-# Check if special:dropdown is currently visible on focused monitor
-mon_id=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .id')
-is_visible=$(hyprctl workspaces -j | jq -r --arg m "$mon_id" '.[] | select(.name=="special:dropdown") | .monitorID' 2>/dev/null)
-if [[ "$is_visible" == "$mon_id" ]]; then
-  # Visible on this monitor - hide it
-  hyprctl dispatch togglespecialworkspace dropdown
+# Determine visibility by y position (negative = hidden above screen)
+current_y=$(hyprctl clients -j | jq -r --arg a "$addr" '.[] | select(.address==$a) | .at[1]')
+
+if [[ "$current_y" -ge 0 ]]; then
+  # Visible → hide above screen
+  hyprctl dispatch movewindowpixel "exact $tx -${th},address:$addr" >/dev/null 2>&1
 else
-  # Hidden - show it
-  hyprctl dispatch togglespecialworkspace dropdown
+  # Hidden → show at target position and focus
+  hyprctl dispatch movewindowpixel "exact $tx ${ty},address:$addr" >/dev/null 2>&1
   sleep 0.05
   hyprctl dispatch focuswindow "address:$addr"
 fi
