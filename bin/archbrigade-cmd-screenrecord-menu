@@ -1,0 +1,109 @@
+#!/bin/bash
+
+[[ -f ~/.config/user-dirs.dirs ]] && source ~/.config/user-dirs.dirs
+OUTPUT_DIR="${ARCHBRIGADE_SCREENRECORD_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}}"
+COMBINED_MODS_FILE="/tmp/archbrigade-screenrecord-mods"
+
+if [[ ! -d "$OUTPUT_DIR" ]]; then
+    notify-send "Screen recording directory does not exist: $OUTPUT_DIR" -u critical -t 3000
+    exit 1
+fi
+
+toggle_indicator() { pkill -RTMIN+8 waybar; }
+screenrecording_active() { pgrep -x wf-recorder >/dev/null; }
+
+cleanup_combined_audio() {
+    [[ -f "$COMBINED_MODS_FILE" ]] || return
+    while read -r mod_id; do
+        [[ -n "$mod_id" ]] && pactl unload-module "$mod_id" 2>/dev/null
+    done < "$COMBINED_MODS_FILE"
+    rm -f "$COMBINED_MODS_FILE"
+}
+
+stop_screenrecording() {
+    pkill -x wf-recorder
+    sleep 0.2
+    cleanup_combined_audio
+    notify-send "Screen recording saved to $OUTPUT_DIR" -t 2000
+    toggle_indicator
+}
+
+get_default_monitor() {
+    pactl info | awk '/Default Sink:/ { print $3 ".monitor" }'
+}
+
+get_mics() {
+    pactl list sources | awk '
+        /Name:/        { name = $2 }
+        /Description:/ {
+            sub(/.*Description: /, "")
+            if (name !~ /\.monitor$/) print name "|" $0
+        }
+    '
+}
+
+select_mic() {
+    local entries desc_list selected_desc
+    entries=$(get_mics)
+    [[ -z "$entries" ]] && { notify-send "No se encontraron micrófonos" -u critical; return 1; }
+    desc_list=$(echo "$entries" | cut -d'|' -f2-)
+    selected_desc=$(echo "$desc_list" | walker -d -p "Micrófono")
+    [[ -z "$selected_desc" ]] && return 1
+    echo "$entries" | awk -F'|' -v d="$selected_desc" '$2 == d { print $1; exit }'
+}
+
+setup_combined_audio() {
+    local mic_source="$1"
+    local desktop_monitor sink_mod lb1_mod lb2_mod
+    desktop_monitor=$(get_default_monitor)
+
+    sink_mod=$(pactl load-module module-null-sink \
+        sink_name=combined_rec \
+        sink_properties=device.description=Combined_Recording)
+    lb1_mod=$(pactl load-module module-loopback \
+        source="$desktop_monitor" sink=combined_rec latency_msec=100)
+    lb2_mod=$(pactl load-module module-loopback \
+        source="$mic_source" sink=combined_rec latency_msec=100)
+
+    printf '%s\n%s\n%s\n' "$sink_mod" "$lb1_mod" "$lb2_mod" > "$COMBINED_MODS_FILE"
+    echo "combined_rec.monitor"
+}
+
+if screenrecording_active; then
+    stop_screenrecording
+    exit 0
+fi
+
+OPT_NONE="🔇  Sin audio"
+OPT_DESK="🖥️   Audio de escritorio"
+OPT_MIC="🎙️   Micrófono"
+OPT_BOTH="🎛️   Ambos"
+
+AUDIO_CHOICE=$(printf '%s\n%s\n%s\n%s\n' \
+    "$OPT_NONE" "$OPT_DESK" "$OPT_MIC" "$OPT_BOTH" \
+    | walker -d -p "Audio")
+
+[[ -z "$AUDIO_CHOICE" ]] && exit 0
+
+AUDIO_ARGS=""
+
+if [[ "$AUDIO_CHOICE" == "$OPT_DESK" ]]; then
+    MONITOR=$(get_default_monitor)
+    AUDIO_ARGS="--audio=$MONITOR"
+elif [[ "$AUDIO_CHOICE" == "$OPT_MIC" ]]; then
+    MIC=$(select_mic) || exit 0
+    AUDIO_ARGS="--audio=$MIC"
+elif [[ "$AUDIO_CHOICE" == "$OPT_BOTH" ]]; then
+    MIC=$(select_mic) || exit 0
+    COMBINED=$(setup_combined_audio "$MIC")
+    AUDIO_ARGS="--audio=$COMBINED"
+fi
+
+REGION=$(slurp) || exit 1
+FILENAME="$OUTPUT_DIR/screenrecording-$(date +'%Y-%m-%d_%H-%M-%S').mp4"
+
+# shellcheck disable=SC2086
+wf-recorder $AUDIO_ARGS -g "$REGION" -f "$FILENAME" \
+    -c libx264 -p crf=23 -p preset=medium -p movflags=+faststart &
+
+toggle_indicator
