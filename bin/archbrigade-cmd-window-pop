@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Toggle pop-out: float, resize, center and pin a window over all workspaces.
+# Running again on a pinned window restores it to tiling.
+
+WIDTH=${1:-1300}
+HEIGHT=${2:-900}
+
+ACTIVE=$(hyprctl activewindow -j)
+PINNED=$(echo "$ACTIVE" | jq ".pinned")
+ADDR=$(echo "$ACTIVE" | jq -r ".address")
+
+[[ -z $ADDR || $ADDR == "null" ]] && exit 1
+
+if [[ $PINNED == "true" ]]; then
+    hyprctl --batch "dispatch pin address:$ADDR ; dispatch togglefloating address:$ADDR"
+else
+    hyprctl --batch "dispatch togglefloating address:$ADDR ; dispatch resizewindowpixel exact $WIDTH $HEIGHT,address:$ADDR ; dispatch centerwindow ; dispatch pin address:$ADDR"
+fi
