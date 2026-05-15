@@ -39,7 +39,24 @@ if [ -f "$AUTO_CONF" ]; then
 fi
 
 # ------------------------------
-# 4. Plymouth + SDDM integration
+# 4. SDDM theme
+# ------------------------------
+SDDM_CONF="/etc/sddm.conf"
+SDDM_THEME="pixel-hollowknight"
+
+if [ -f "$SDDM_CONF" ]; then
+    if grep -q "^\[Theme\]" "$SDDM_CONF"; then
+        sudo sed -i "s/^Current=.*/Current=$SDDM_THEME/" "$SDDM_CONF"
+    else
+        echo -e "\n[Theme]\nCurrent=$SDDM_THEME" | sudo tee -a "$SDDM_CONF" > /dev/null
+    fi
+else
+    echo -e "[Theme]\nCurrent=$SDDM_THEME" | sudo tee "$SDDM_CONF" > /dev/null
+fi
+echo "SDDM theme set to $SDDM_THEME."
+
+# ------------------------------
+# 5. Plymouth + SDDM integration
 # ------------------------------
 # Plymouth quits automatically when graphical.target is reached
 echo "Plymouth splash will remain until SDDM starts. User will now be prompted to log in."
