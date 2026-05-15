@@ -16,6 +16,7 @@ run_logged $ARCHBRIGADE_INSTALL/config/fix-powerprofilesctl-shebang.sh
 run_logged $ARCHBRIGADE_INSTALL/config/docker.sh
 run_logged $ARCHBRIGADE_INSTALL/config/mimetypes.sh
 run_logged $ARCHBRIGADE_INSTALL/config/localdb.sh
+run_logged $ARCHBRIGADE_INSTALL/config/claude.sh
 run_logged $ARCHBRIGADE_INSTALL/config/sudoless-asdcontrol.sh
 run_logged $ARCHBRIGADE_INSTALL/config/hardware/network.sh
 run_logged $ARCHBRIGADE_INSTALL/config/hardware/set-wireless-regdom.sh
