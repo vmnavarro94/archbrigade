@@ -82,6 +82,14 @@ power-profiles-daemon
 python-gobject
 python-poetry-core
 qt5-wayland
+qt6-5compat
+qt6-multimedia
+qt6-multimedia-ffmpeg
+qt6-svg
+gst-plugins-base
+gst-plugins-good
+gst-plugins-bad
+gst-plugins-ugly
 ripgrep
 satty
 sddm

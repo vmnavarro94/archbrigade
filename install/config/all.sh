@@ -1,5 +1,6 @@
 run_logged $ARCHBRIGADE_INSTALL/config/cleanup-old-configs.sh
 run_logged $ARCHBRIGADE_INSTALL/config/config.sh
+run_logged $ARCHBRIGADE_INSTALL/config/ohmyzsh.sh
 run_logged $ARCHBRIGADE_INSTALL/config/elephant.sh
 run_logged $ARCHBRIGADE_INSTALL/config/theme.sh
 run_logged $ARCHBRIGADE_INSTALL/config/branding.sh
@@ -26,6 +27,9 @@ run_logged $ARCHBRIGADE_INSTALL/config/hardware/printer.sh
 run_logged $ARCHBRIGADE_INSTALL/config/hardware/usb-autosuspend.sh
 run_logged $ARCHBRIGADE_INSTALL/config/hardware/ignore-power-button.sh
 run_logged $ARCHBRIGADE_INSTALL/config/hardware/nvidia.sh
+run_logged $ARCHBRIGADE_INSTALL/config/hardware/gpu.sh
+run_logged $ARCHBRIGADE_INSTALL/config/hardware/cpu-microcode.sh
+run_logged $ARCHBRIGADE_INSTALL/config/hardware/intel.sh
 run_logged $ARCHBRIGADE_INSTALL/config/hardware/fix-f13-amd-audio-input.sh
 run_logged $ARCHBRIGADE_INSTALL/config/hardware/fix-apple-bcm43xx.sh
 run_logged $ARCHBRIGADE_INSTALL/config/hardware/fix-apple-spi-keyboard.sh

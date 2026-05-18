@@ -39,11 +39,33 @@ if [ -f "$AUTO_CONF" ]; then
 fi
 
 # ------------------------------
-# 4. SDDM theme
+# 4. Install qylock (SDDM + quickshell lockscreen with pixel-hollowknight theme)
 # ------------------------------
-SDDM_CONF="/etc/sddm.conf"
 SDDM_THEME="pixel-hollowknight"
+QYLOCK_DEST="$HOME/.local/share/quickshell-lockscreen"
 
+if [[ ! -d "/usr/share/sddm/themes/$SDDM_THEME" ]]; then
+    echo "Installing qylock lockscreen and $SDDM_THEME SDDM theme..."
+    QYLOCK_TMP=$(mktemp -d)
+    trap "rm -rf '$QYLOCK_TMP'" EXIT
+
+    git clone --depth 1 https://github.com/Darkkal44/qylock.git "$QYLOCK_TMP"
+
+    # Install the SDDM theme
+    sudo cp -r "$QYLOCK_TMP/themes/$SDDM_THEME" "/usr/share/sddm/themes/$SDDM_THEME"
+
+    # Install the quickshell lockscreen wrapper
+    rm -rf "$QYLOCK_DEST"
+    cp -r "$QYLOCK_TMP/quickshell-lockscreen" "$QYLOCK_DEST"
+    chmod +x "$QYLOCK_DEST/lock.sh"
+    # Point themes_link to /usr/share/sddm/themes (shared with SDDM)
+    ln -sfn /usr/share/sddm/themes "$QYLOCK_DEST/themes_link"
+
+    echo "qylock installed."
+fi
+
+# Configure SDDM to use the theme
+SDDM_CONF="/etc/sddm.conf"
 if [ -f "$SDDM_CONF" ]; then
     if grep -q "^\[Theme\]" "$SDDM_CONF"; then
         sudo sed -i "s/^Current=.*/Current=$SDDM_THEME/" "$SDDM_CONF"

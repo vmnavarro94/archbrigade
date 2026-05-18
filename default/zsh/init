@@ -2,7 +2,7 @@ if command -v mise &> /dev/null; then
   eval "$(mise activate zsh)"
 fi
 
-if command -v starship &> /dev/null; then
+if command -v starship &> /dev/null && [[ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]]; then
   eval "$(starship init zsh)"
 fi
 

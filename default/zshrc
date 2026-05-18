@@ -2,6 +2,14 @@
 # (don't mess with these directly, just overwrite them here!)
 source ~/.local/share/archbrigade/default/zsh/rc
 
+# Shell prompt (oh-my-zsh + agnosterzak powerline theme)
+if [[ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]] && [[ -f "$HOME/.oh-my-zsh/themes/agnosterzak.zsh-theme" ]]; then
+  export ZSH="$HOME/.oh-my-zsh"
+  ZSH_THEME="agnosterzak"
+  plugins=(git)
+  source $ZSH/oh-my-zsh.sh
+fi
+
 # Add your own exports, aliases, and functions here.
 #
 # alias p='python'
