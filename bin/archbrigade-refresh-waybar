@@ -1,5 +1,4 @@
 #!/bin/bash
 
-archbrigade-refresh-config waybar/config.jsonc
 archbrigade-refresh-config waybar/style.css
 archbrigade-restart-waybar
