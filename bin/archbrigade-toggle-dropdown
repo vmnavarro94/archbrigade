@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Dropdown terminal - pinned float toggled by moving on/off screen.
-# Using pin instead of special:dropdown prevents new windows from being
-# trapped in the special workspace and allows clicking through to background windows.
+# Dropdown terminal — hidden in special:dropdown workspace, shown on current workspace.
+# Using special workspace (not pin+off-screen) avoids Hyprland correcting window
+# position on workspace switch and focus restoration jumping to wrong workspace.
 
 ADDR_FILE="/tmp/archbrigade_dropdown_addr"
 PREV_FOCUS_FILE="/tmp/archbrigade_dropdown_prev_focus"
@@ -36,34 +36,39 @@ if [[ -n "$addr" ]] && ! hyprctl clients -j | jq -e --arg a "$addr" 'any(.[]; .a
   rm -f "$ADDR_FILE"
 fi
 
-# Spawn hidden above screen if not running
+# Spawn into special workspace if not running
 if [[ -z "$addr" ]]; then
-  hyprctl dispatch exec "[float; pin; size $tw $th; move exact $tx -${th}; nofocus] kitty --class archbrigade-dropdown"
+  hyprctl dispatch exec "[float; size $tw $th; nofocus] kitty --class archbrigade-dropdown"
   sleep 0.4
   addr=$(hyprctl clients -j | jq -r --arg c "archbrigade-dropdown" '[.[] | select(.class==$c)] | last | .address')
   echo "$addr" > "$ADDR_FILE"
+  hyprctl dispatch movetoworkspacesilent "special:dropdown,address:$addr"
   # --hidden: pre-warm only, stay hidden
   [[ "$1" == "--hidden" ]] && exit 0
-  # Freshly spawned above screen → fall through to show logic
+  # Freshly spawned → fall through to show logic
 fi
 
-# Determine visibility by y position (negative = hidden above screen)
-current_y=$(hyprctl clients -j | jq -r --arg a "$addr" '.[] | select(.address==$a) | .at[1]')
+# Determine visibility by workspace (special:dropdown = hidden)
+ws=$(hyprctl clients -j | jq -r --arg a "$addr" '.[] | select(.address==$a) | .workspace.name')
 
-if [[ "$current_y" -ge 0 ]]; then
-  # Visible → hide above screen, restore previous focus
-  hyprctl dispatch movewindowpixel "exact $tx -${th},address:$addr" >/dev/null 2>&1
+if [[ "$ws" != "special:dropdown" ]]; then
+  # Visible → move to special workspace (hide), restore focus on current workspace
+  hyprctl dispatch movetoworkspacesilent "special:dropdown,address:$addr"
+  current_ws=$(hyprctl activeworkspace -j | jq -r '.id')
   prev=$(cat "$PREV_FOCUS_FILE" 2>/dev/null)
-  if [[ -n "$prev" ]] && hyprctl clients -j | jq -e --arg a "$prev" 'any(.[]; .address==$a)' >/dev/null 2>&1; then
+  prev_ws=$(hyprctl clients -j | jq -r --arg a "$prev" '.[] | select(.address==$a) | .workspace.id' 2>/dev/null)
+  if [[ -n "$prev" ]] && [[ "$prev_ws" == "$current_ws" ]] && hyprctl clients -j | jq -e --arg a "$prev" 'any(.[]; .address==$a)' >/dev/null 2>&1; then
     sleep 0.05
     hyprctl dispatch focuswindow "address:$prev" >/dev/null 2>&1
   else
-    hyprctl dispatch focuswindow prev >/dev/null 2>&1
+    hyprctl dispatch cyclenext >/dev/null 2>&1
   fi
 else
-  # Hidden → save current focus, show at target position and focus
+  # Hidden → move to current workspace, position, focus
   hyprctl activewindow -j | jq -r '.address' > "$PREV_FOCUS_FILE"
-  hyprctl dispatch movewindowpixel "exact $tx ${ty},address:$addr" >/dev/null 2>&1
+  ws_id=$(hyprctl activeworkspace -j | jq -r '.id')
+  hyprctl dispatch movetoworkspace "$ws_id,address:$addr"
+  hyprctl dispatch movewindowpixel "exact $tx ${ty},address:$addr"
   sleep 0.05
   hyprctl dispatch focuswindow "address:$addr"
 fi
