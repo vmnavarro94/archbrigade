@@ -4,6 +4,7 @@
 # trapped in the special workspace and allows clicking through to background windows.
 
 ADDR_FILE="/tmp/archbrigade_dropdown_addr"
+PREV_FOCUS_FILE="/tmp/archbrigade_dropdown_prev_focus"
 WIDTH_PERCENT=80
 HEIGHT_PERCENT=55
 
@@ -41,6 +42,8 @@ if [[ -z "$addr" ]]; then
   sleep 0.4
   addr=$(hyprctl clients -j | jq -r --arg c "archbrigade-dropdown" '[.[] | select(.class==$c)] | last | .address')
   echo "$addr" > "$ADDR_FILE"
+  # --hidden: pre-warm only, stay hidden
+  [[ "$1" == "--hidden" ]] && exit 0
   # Freshly spawned above screen → fall through to show logic
 fi
 
@@ -48,10 +51,18 @@ fi
 current_y=$(hyprctl clients -j | jq -r --arg a "$addr" '.[] | select(.address==$a) | .at[1]')
 
 if [[ "$current_y" -ge 0 ]]; then
-  # Visible → hide above screen
+  # Visible → hide above screen, restore previous focus
   hyprctl dispatch movewindowpixel "exact $tx -${th},address:$addr" >/dev/null 2>&1
+  prev=$(cat "$PREV_FOCUS_FILE" 2>/dev/null)
+  if [[ -n "$prev" ]] && hyprctl clients -j | jq -e --arg a "$prev" 'any(.[]; .address==$a)' >/dev/null 2>&1; then
+    sleep 0.05
+    hyprctl dispatch focuswindow "address:$prev" >/dev/null 2>&1
+  else
+    hyprctl dispatch focuswindow prev >/dev/null 2>&1
+  fi
 else
-  # Hidden → show at target position and focus
+  # Hidden → save current focus, show at target position and focus
+  hyprctl activewindow -j | jq -r '.address' > "$PREV_FOCUS_FILE"
   hyprctl dispatch movewindowpixel "exact $tx ${ty},address:$addr" >/dev/null 2>&1
   sleep 0.05
   hyprctl dispatch focuswindow "address:$addr"

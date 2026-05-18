@@ -1,7 +1,12 @@
 #!/bin/bash
 
 # Lock the screen
-pidof hyprlock || hyprlock &
+LOCKSCREEN="$HOME/.local/share/quickshell-lockscreen/lock.sh"
+if [[ -x "$LOCKSCREEN" ]]; then
+  pgrep -f "lock_shell.qml" || bash "$LOCKSCREEN" pixel-hollowknight &
+else
+  pidof hyprlock || hyprlock &
+fi
 
 # Ensure Bitwarden is locked
 if pgrep -x "bitwarden" >/dev/null; then
