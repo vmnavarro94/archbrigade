@@ -2,8 +2,9 @@
 -- List current monitors and supported resolutions with: hyprctl monitors all
 --
 -- NOTE: nwg-displays generates Hyprland .conf syntax (monitors.conf) and does
--- not understand this Lua file. Until that integration is reworked (Phase 2),
--- configure monitors by hand here instead of using nwg-displays.
+-- not understand this Lua file. After saving a layout in nwg-displays, run
+-- archbrigade-sync-monitors to regenerate this file from monitors.conf
+-- (it overwrites this file, so keep personal extras in other hypr/*.lua files).
 
 -- Optimized for retina-class 2x displays, like 13" 2.8K, 27" 5K, 32" 6K.
 local archbrigade_gdk_scale = 2
