@@ -16,7 +16,7 @@ fi
 focused=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true).name')
 
 hypr_focus_monitor() {
-  hyprctl dispatch "hl.dsp.focus({ monitor = \"$1\" })" >/dev/null 2>&1 || hyprctl dispatch focusmonitor "$1" >/dev/null
+  hyprctl dispatch "hl.dsp.focus({ monitor = \"$1\" })" >/dev/null 2>&1 || hyprctl dispatch focusmonitor "$1" >/dev/null 2>&1
 }
 
 hypr_exec() {
