@@ -8,9 +8,9 @@ if [[ -z "$config_file" ]]; then
   Usage: $0 [config_file]
 
   Must provide a file path from the .config directory to be refreshed.
-  To copy ~/.local/share/archbrigade/config/hypr/hyprlock.conf to ~/.config/hypr/hyprlock.conf
+  To copy ~/.local/share/archbrigade/config/hypr/hyprland.lua to ~/.config/hypr/hyprland.lua
 
-    $0 hypr/hyprlock.conf
+    $0 hypr/hyprland.lua
 USAGE
   exit 1
 fi
@@ -21,10 +21,24 @@ if [[ "$config_file" == "hypr/monitors.conf" ]]; then
   exit 1
 fi
 
-# Backup the destination file (with timestamp) to avoid clobbering (Ex: hyprlock.conf.bak.1753817951)
+# monitors.lua holds the user's monitor layout and must never be overwritten
+# (regenerate it from monitors.conf with archbrigade-sync-monitors instead)
+if [[ "$config_file" == "hypr/monitors.lua" ]]; then
+  echo "Refusing to overwrite hypr/monitors.lua — your monitor layout is never overwritten."
+  exit 1
+fi
+
+# Backup the destination file (with timestamp) to avoid clobbering (Ex: hyprland.lua.bak.1753817951)
 user_config_file="${HOME}/.config/$config_file"
 default_config_file="${HOME}/.local/share/archbrigade/config/$config_file"
 backup_config_file="$user_config_file.bak.$(date +%s)"
+
+if [[ ! -e "$default_config_file" ]]; then
+  echo "Not a shipped user config: $config_file" >&2
+  exit 1
+fi
+
+mkdir -p "$(dirname "$user_config_file")"
 
 if [[ -f "$user_config_file" ]]; then
   # Create preliminary backup

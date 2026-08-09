@@ -20,6 +20,13 @@ fi
 # Update theme symlinks
 ln -nsf "$THEME_PATH" "$CURRENT_THEME_DIR"
 
+# Hyprland theme overrides are now a Lua module (hyprland.lua) loaded via
+# require. Legacy themes that only ship hyprland.conf are tolerated: their
+# Hyprland overrides are skipped, everything else still applies.
+if [[ ! -f "$THEME_PATH/hyprland.lua" && -f "$THEME_PATH/hyprland.conf" ]]; then
+  echo "Warning: theme '$THEME_NAME' only ships hyprland.conf (pre-Lua). Skipping its Hyprland overrides until it provides hyprland.lua."
+fi
+
 # Change background with theme
 archbrigade-theme-bg-next
 

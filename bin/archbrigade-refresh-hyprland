@@ -1,7 +1,20 @@
 #!/bin/bash
 
-archbrigade-refresh-config hypr/autostart.conf
-archbrigade-refresh-config hypr/bindings.conf
-archbrigade-refresh-config hypr/envs.conf
-archbrigade-refresh-config hypr/input.conf
-archbrigade-refresh-config hypr/hyprland.conf
+# Overwrite the user Hyprland Lua configs in ~/.config/hypr with the
+# ArchBrigade defaults (your versions are backed up with a .bak suffix).
+#
+# hypr/monitors.lua is deliberately NOT refreshed: your monitor layout is
+# never overwritten. Regenerate it from monitors.conf with
+# archbrigade-sync-monitors instead.
+
+archbrigade-refresh-config hypr/.luarc.json
+archbrigade-refresh-config hypr/autostart.lua
+archbrigade-refresh-config hypr/bindings.lua
+archbrigade-refresh-config hypr/envs.lua
+archbrigade-refresh-config hypr/input.lua
+archbrigade-refresh-config hypr/looknfeel.lua
+archbrigade-refresh-config hypr/hyprland.lua
+
+# Seed the toggle flags state that default/hypr/toggles.lua loads on start.
+mkdir -p ~/.local/state/archbrigade/toggles/hypr
+cp -f "${ARCHBRIGADE_PATH:-$HOME/.local/share/archbrigade}/default/hypr/toggles/flags.lua" ~/.local/state/archbrigade/toggles/hypr/
