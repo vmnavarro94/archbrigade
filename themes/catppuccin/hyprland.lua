@@ -1,0 +1,9 @@
+-- Catppuccin theme overrides for Hyprland.
+
+hl.config({
+  general = {
+    col = {
+      active_border = "rgb(c6d0f5)",
+    },
+  },
+})
