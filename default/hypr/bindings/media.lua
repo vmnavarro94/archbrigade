@@ -1,34 +1,25 @@
--- Volume, brightness, keyboard backlight, and touchpad controls.
-o.bind("XF86AudioRaiseVolume", "Volume up", "archbrigade-audio-output-volume raise", { locked = true, repeating = true })
-o.bind("XF86AudioLowerVolume", "Volume down", "archbrigade-audio-output-volume lower", { locked = true, repeating = true })
-o.bind("XF86AudioMute", "Mute", "archbrigade-audio-output-volume mute-toggle", { locked = true })
-o.bind("XF86AudioMicMute", "Mute microphone", "archbrigade-audio-input-mute", { locked = true })
-o.bind("XF86MonBrightnessUp", "Brightness up", "archbrigade-brightness-display +5%", { locked = true, repeating = true })
-o.bind("XF86MonBrightnessDown", "Brightness down", "archbrigade-brightness-display 5%-", { locked = true, repeating = true })
-o.bind("SHIFT + XF86MonBrightnessUp", "Brightness maximum", "archbrigade-brightness-display 100%", { locked = true, repeating = true })
-o.bind("SHIFT + XF86MonBrightnessDown", "Brightness minimum", "archbrigade-brightness-display 1%", { locked = true, repeating = true })
-o.bind("XF86KbdBrightnessUp", "Keyboard brightness up", "archbrigade-brightness-keyboard up", { locked = true, repeating = true })
-o.bind("XF86KbdBrightnessDown", "Keyboard brightness down", "archbrigade-brightness-keyboard down", { locked = true, repeating = true })
-o.bind("XF86KbdLightOnOff", "Keyboard backlight cycle", "archbrigade-brightness-keyboard cycle", { locked = true })
-o.bind_toggle("XF86TouchpadToggle", "Toggle touchpad", "touchpad", { locked = true })
-o.bind("XF86TouchpadOn", "Enable touchpad", "archbrigade-toggle-touchpad on", { locked = true })
-o.bind("XF86TouchpadOff", "Disable touchpad", "archbrigade-toggle-touchpad off", { locked = true })
+-- Only display the OSD on the currently focused monitor.
+local osdclient = [[swayosd-client --monitor "$(hyprctl monitors -j | jq -r '.[] | select(.focused == true).name')"]]
 
--- Precise volume and brightness controls.
-o.bind("ALT + XF86AudioRaiseVolume", "Volume up precise", "archbrigade-audio-output-volume +1", { locked = true, repeating = true })
-o.bind("ALT + XF86AudioLowerVolume", "Volume down precise", "archbrigade-audio-output-volume -1", { locked = true, repeating = true })
-o.bind("ALT + XF86MonBrightnessUp", "Brightness up precise", "archbrigade-brightness-display +1%", { locked = true, repeating = true })
-o.bind("ALT + XF86MonBrightnessDown", "Brightness down precise", "archbrigade-brightness-display 1%-", { locked = true, repeating = true })
+-- Laptop multimedia keys for volume and LCD brightness (with OSD).
+o.bind("XF86AudioRaiseVolume", "Volume up", osdclient .. " --output-volume raise", { locked = true, repeating = true })
+o.bind("XF86AudioLowerVolume", "Volume down", osdclient .. " --output-volume lower", { locked = true, repeating = true })
+o.bind("XF86AudioMute", "Mute", osdclient .. " --output-volume mute-toggle", { locked = true, repeating = true })
+o.bind("XF86AudioMicMute", "Mute microphone", osdclient .. " --input-volume mute-toggle", { locked = true, repeating = true })
+o.bind("XF86MonBrightnessUp", "Brightness up", osdclient .. " --brightness raise", { locked = true, repeating = true })
+o.bind("XF86MonBrightnessDown", "Brightness down", osdclient .. " --brightness lower", { locked = true, repeating = true })
 
--- Media controls.
-o.bind("XF86AudioNext", "Next track", "archbrigade-shell media next", { locked = true })
-o.bind("ALT + XF86AudioPlay", "Next track", "archbrigade-shell media next", { locked = true })
-o.bind("XF86AudioPause", "Pause", "archbrigade-shell media playPause", { locked = true })
-o.bind("XF86AudioPlay", "Play", "archbrigade-shell media playPause", { locked = true })
-o.bind("XF86AudioPrev", "Previous track", "archbrigade-shell media previous", { locked = true })
-o.bind("ALT + SHIFT + XF86AudioPlay", "Previous track", "archbrigade-shell media previous", { locked = true })
-o.bind("XF86Eject", "Eject media", "eject", { locked = true })
+-- Precise 1% multimedia adjustments with Alt modifier.
+o.bind("ALT + XF86AudioRaiseVolume", "Volume up precise", osdclient .. " --output-volume +1", { locked = true, repeating = true })
+o.bind("ALT + XF86AudioLowerVolume", "Volume down precise", osdclient .. " --output-volume -1", { locked = true, repeating = true })
+o.bind("ALT + XF86MonBrightnessUp", "Brightness up precise", osdclient .. " --brightness +1", { locked = true, repeating = true })
+o.bind("ALT + XF86MonBrightnessDown", "Brightness down precise", osdclient .. " --brightness -1", { locked = true, repeating = true })
 
-o.bind("SHIFT + XF86AudioMute", "Switch audio output", "archbrigade-audio-output-switch", { locked = true })
-o.bind("SHIFT + XF86AudioPause", "Switch media source", "archbrigade-audio-source-switch", { locked = true })
-o.bind("SHIFT + XF86AudioPlay", "Switch media source", "archbrigade-audio-source-switch", { locked = true })
+-- Requires playerctl.
+o.bind("XF86AudioNext", "Next track", osdclient .. " --playerctl next", { locked = true })
+o.bind("XF86AudioPause", "Pause", osdclient .. " --playerctl play-pause", { locked = true })
+o.bind("XF86AudioPlay", "Play", osdclient .. " --playerctl play-pause", { locked = true })
+o.bind("XF86AudioPrev", "Previous track", osdclient .. " --playerctl previous", { locked = true })
+
+-- Switch audio output with Super + Mute.
+o.bind("SUPER + XF86AudioMute", "Switch audio output", "archbrigade-cmd-audio-switch", { locked = true })

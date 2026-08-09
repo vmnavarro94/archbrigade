@@ -77,3 +77,6 @@ hl.config({
 -- Scroll nicely in the terminal.
 o.window("(Alacritty|kitty|foot)", { scroll_touchpad = 1.5 })
 o.window("com.mitchellh.ghostty", { scroll_touchpad = 0.2 })
+
+-- Touchpad gestures: three-finger horizontal swipe changes workspace.
+hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })

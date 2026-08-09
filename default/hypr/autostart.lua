@@ -1,14 +1,19 @@
 hl.on("hyprland.start", function()
   -- Slow app launch fix -- set systemd vars before starting session services.
-  hl.exec_cmd("systemctl --user import-environment $(env | cut -d'=' -f 1)")
   hl.exec_cmd("dbus-update-activation-environment --systemd --all")
 
-  hl.exec_cmd("archbrigade-launch-shell")
-  hl.exec_cmd("archbrigade-first-run")
-  hl.exec_cmd("archbrigade-powerprofiles-init")
-  hl.exec_cmd(o.launch("archbrigade-hyprland-monitor-watch"))
-  hl.exec_cmd(o.launch("udiskie --automount --no-notify --no-tray"))
-
-  -- Run post-boot hooks after startup config has loaded.
-  hl.exec_cmd("sleep 2 && archbrigade-hook post-boot")
+  hl.exec_cmd(o.launch("hypridle"))
+  hl.exec_cmd(o.launch("mako"))
+  hl.exec_cmd(o.launch("waybar"))
+  hl.exec_cmd(o.launch("fcitx5"))
+  hl.exec_cmd(o.launch("swaybg -i ~/.config/archbrigade/current/background -m fill"))
+  hl.exec_cmd(o.launch("swayosd-server"))
+  hl.exec_cmd("systemctl --user start elephant")
+  hl.exec_cmd(o.launch("walker --gapplication-service"))
+  hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
+  hl.exec_cmd([[wl-clip-persist --clipboard regular --all-mime-type-regex '^(?!x-kde-passwordManagerHint).+']])
+  hl.exec_cmd(o.launch("wl-paste --watch cliphist store"))
+  hl.exec_cmd("archbrigade-cmd-first-run")
+  hl.exec_cmd("bash -c 'sleep 4 && archbrigade-toggle-dropdown --hidden'")
+  hl.exec_cmd("qs -c overview")
 end)

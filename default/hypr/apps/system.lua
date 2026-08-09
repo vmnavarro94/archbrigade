@@ -1,56 +1,29 @@
 -- Floating windows.
 o.window({ tag = "floating-window" }, { float = true })
 o.window({ tag = "floating-window" }, { center = true })
-o.window({ tag = "floating-window" }, { size = { 875, 600 } })
+o.window({ tag = "floating-window" }, { size = { 800, 600 } })
+o.window("archbrigade-screenrecord", { size = { 500, 300 } })
 
 o.window(
-  "(org.archbrigade.btop|org.archbrigade.terminal|org.archbrigade.bash|org.codeberg.dnkl.foot|org.gnome.NautilusPreviewer|org.gnome.Evince|ArchBrigade|About|TUI.float|imv|mpv)",
-  {
-    tag = "+floating-window",
-  }
+  "(blueberry.py|Impala|Wiremix|org.gnome.NautilusPreviewer|com.gabm.satty|ArchBrigade|About|TUI.float|archbrigade-screenrecord|qalculate-gtk|org.gnome.Calculator)",
+  { tag = "+floating-window" }
 )
-
--- The portal only ever shows dialogs — file pickers, screen shares, permission
--- prompts — so every one of its windows belongs in the floating treatment,
--- whatever the app that asked for it titled it.
-o.window("xdg-desktop-portal-gtk", { tag = "+floating-window" })
 o.window({
-  class = "(sublime_text|DesktopEditors|org.gnome.Nautilus)",
-  title = "^(Open.*Files?|Open [F|f]older.*|Save.*Files?|Save.*As|Save|All Files|.*wants to [open|save].*|[C|c]hoose.*)",
+  class = "(xdg-desktop-portal-gtk|sublime_text|DesktopEditors|org.gnome.Nautilus)",
+  title = "^(Open.*Files?|Open [F|f]older.*|Save.*Files?|Save.*As|Save|All Files)",
 }, { tag = "+floating-window" })
 
--- The About fastfetch layout needs more columns than the standard float provides.
--- This size only positions the first paint: archbrigade-launch-about then measures
--- the rendered content and fits the window to it exactly.
-o.window("org.archbrigade.about", { float = true })
-o.window("org.archbrigade.about", { center = true })
-o.window("org.archbrigade.about", { size = { 920, 480 } })
-
-o.window("dev.tensaku.Tensaku", { float = true })
-o.window("dev.tensaku.Tensaku", { center = true })
-o.window("omacalc", { float = true })
+-- Dropdown terminal (80% width centered, 40% height, pinned to top).
+o.window("archbrigade-dropdown", { float = true })
+o.window("archbrigade-dropdown", { workspace = "special:dropdown" })
+o.window("archbrigade-dropdown", { size = { 2048, 576 } })
+o.window("archbrigade-dropdown", { move = { 256, 0 } })
 
 -- Fullscreen screensaver.
-o.window("org.archbrigade.screensaver", { fullscreen = true })
-o.window("org.archbrigade.screensaver", { float = true })
-o.window("org.archbrigade.screensaver", { animation = "slide" })
+o.window("Screensaver", { fullscreen = true })
 
 -- No transparency on media windows.
 o.window(
   "^(zoom|vlc|mpv|org.kde.kdenlive|com.obsproject.Studio|com.github.PintaProject.Pinta|imv|org.gnome.NautilusPreviewer)$",
-  {
-    tag = "-default-opacity",
-  }
+  { opacity = "1 1" }
 )
-o.window(
-  "^(zoom|vlc|mpv|org.kde.kdenlive|com.obsproject.Studio|com.github.PintaProject.Pinta|imv|org.gnome.NautilusPreviewer)$",
-  {
-    opacity = "1 1",
-  }
-)
-
--- Popped window rounding.
-o.window({ tag = "pop" }, { rounding = 8 })
-
--- Prevent idle while open.
-o.window({ tag = "noidle" }, { idle_inhibit = "always" })
