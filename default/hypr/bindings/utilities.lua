@@ -17,7 +17,9 @@ o.bind("SUPER + CTRL + B", "Battery status", [[bash -c 'BATTERY=$(cat /sys/class
 o.bind_toggle("SUPER + SHIFT + SPACE", "Toggle top bar", "waybar")
 o.bind("SUPER + CTRL + SPACE", "Next background in theme", "archbrigade-theme-bg-next")
 o.bind("SUPER + SHIFT + CTRL + SPACE", "Pick new theme", "archbrigade-menu theme")
-o.bind("SUPER + BACKSPACE", "Toggle window transparency", [[hyprctl dispatch setprop "address:$(hyprctl activewindow -j | jq -r '.address')" opaque toggle]])
+-- Lua provider: hl.dsp.window.set_prop({ prop, value, window? }) defaults to
+-- the active window; hl.dispatch() executes the dispatcher immediately.
+o.bind("SUPER + BACKSPACE", "Toggle window transparency", [[hyprctl eval 'hl.dispatch(hl.dsp.window.set_prop({ prop = "opaque", value = "toggle" }))' >/dev/null 2>&1 || hyprctl dispatch setprop "address:$(hyprctl activewindow -j | jq -r '.address')" opaque toggle]])
 o.bind("SUPER + SHIFT + BACKSPACE", "Toggle window gaps", "archbrigade-cmd-window-gaps-toggle")
 
 -- Notifications.
@@ -60,4 +62,4 @@ o.bind("SUPER + CTRL + S", "Share", "archbrigade-menu share")
 
 -- Zoom.
 o.bind("SUPER + CTRL + Z", "Zoom in", "archbrigade-cmd-zoom-in")
-o.bind("SUPER + CTRL + ALT + Z", "Reset zoom", "hyprctl keyword cursor:zoom_factor 1")
+o.bind("SUPER + CTRL + ALT + Z", "Reset zoom", [[hyprctl eval 'hl.config({ cursor = { zoom_factor = 1 } })' >/dev/null 2>&1 || hyprctl keyword cursor:zoom_factor 1]])
