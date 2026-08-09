@@ -12,8 +12,21 @@ ADDR=$(echo "$ACTIVE" | jq -r ".address")
 
 [[ -z $ADDR || $ADDR == "null" ]] && exit 1
 
+WINDOW="address:$ADDR"
+
+# Dispatch via the Lua config provider, falling back to legacy hyprlang syntax.
+hypr_dispatch() {
+  local lua="$1"
+  shift
+  hyprctl dispatch "$lua" >/dev/null 2>&1 || hyprctl dispatch "$@" >/dev/null 2>&1
+}
+
 if [[ $PINNED == "true" ]]; then
-    hyprctl --batch "dispatch pin address:$ADDR ; dispatch togglefloating address:$ADDR"
+    hypr_dispatch "hl.dsp.window.pin({ window = \"$WINDOW\" })" pin "$WINDOW"
+    hypr_dispatch "hl.dsp.window.float({ window = \"$WINDOW\", action = \"toggle\" })" togglefloating "$WINDOW"
 else
-    hyprctl --batch "dispatch togglefloating address:$ADDR ; dispatch resizewindowpixel exact $WIDTH $HEIGHT,address:$ADDR ; dispatch centerwindow ; dispatch pin address:$ADDR"
+    hypr_dispatch "hl.dsp.window.float({ window = \"$WINDOW\", action = \"toggle\" })" togglefloating "$WINDOW"
+    hypr_dispatch "hl.dsp.window.resize({ window = \"$WINDOW\", x = $WIDTH, y = $HEIGHT })" resizewindowpixel "exact $WIDTH $HEIGHT,$WINDOW"
+    hypr_dispatch "hl.dsp.window.center({ window = \"$WINDOW\" })" centerwindow
+    hypr_dispatch "hl.dsp.window.pin({ window = \"$WINDOW\" })" pin "$WINDOW"
 fi

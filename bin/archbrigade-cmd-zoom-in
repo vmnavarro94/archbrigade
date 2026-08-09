@@ -4,4 +4,5 @@
 
 CURRENT=$(hyprctl getoption cursor:zoom_factor -j 2>/dev/null | jq '.float // 1')
 NEW=$(echo "$CURRENT + 1" | bc)
-hyprctl keyword cursor:zoom_factor "$NEW"
+hyprctl eval "hl.config({ cursor = { zoom_factor = $NEW } })" >/dev/null 2>&1 ||
+  hyprctl keyword cursor:zoom_factor "$NEW"

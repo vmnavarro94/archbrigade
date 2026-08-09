@@ -15,14 +15,24 @@ fi
 
 focused=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true).name')
 
+hypr_focus_monitor() {
+  hyprctl dispatch "hl.dsp.focus({ monitor = \"$1\" })" >/dev/null 2>&1 || hyprctl dispatch focusmonitor "$1" >/dev/null
+}
+
+hypr_exec() {
+  local command
+  printf -v command '%q ' "$@"
+
+  hyprctl dispatch "hl.dsp.exec_cmd([[$command]])" >/dev/null 2>&1 || hyprctl dispatch exec -- bash -lc "$command" >/dev/null
+}
+
 for m in $(hyprctl monitors -j | jq -r '.[] | .name'); do
-  hyprctl dispatch focusmonitor $m
+  hypr_focus_monitor "$m"
 
   # FIXME: Find a way to make this generic where we it can work for kitty + ghostty
-  hyprctl dispatch exec -- \
-    alacritty --class Screensaver \
-    --config-file ~/.local/share/archbrigade/default/alacritty/screensaver.toml \
+  hypr_exec alacritty --class Screensaver \
+    --config-file "$HOME/.local/share/archbrigade/default/alacritty/screensaver.toml" \
     -e archbrigade-cmd-screensaver
 done
 
-hyprctl dispatch focusmonitor $focused
+hypr_focus_monitor "$focused"

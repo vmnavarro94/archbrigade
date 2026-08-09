@@ -2,12 +2,14 @@
 
 # Toggle window gaps and borders on/off globally.
 
-CURRENT=$(hyprctl getoption general:gaps_in -j 2>/dev/null | jq -r '.custom' | awk '{print $1}')
+CURRENT=$(hyprctl getoption general:gaps_in -j 2>/dev/null | jq -r '.custom // .css // "0"' | awk '{print $1}')
 
 if [[ "$CURRENT" -gt 0 ]]; then
-    hyprctl --batch "keyword general:gaps_in 0 ; keyword general:gaps_out 0 ; keyword general:border_size 0 ; keyword decoration:rounding 0"
+    hyprctl eval 'hl.config({ general = { gaps_in = 0, gaps_out = 0, border_size = 0 }, decoration = { rounding = 0 } })' >/dev/null 2>&1 ||
+        hyprctl --batch "keyword general:gaps_in 0 ; keyword general:gaps_out 0 ; keyword general:border_size 0 ; keyword decoration:rounding 0"
     notify-send -u low "  Gaps off"
 else
-    hyprctl --batch "keyword general:gaps_in 5 ; keyword general:gaps_out 10 ; keyword general:border_size 2"
+    hyprctl eval 'hl.config({ general = { gaps_in = 5, gaps_out = 10, border_size = 2 } })' >/dev/null 2>&1 ||
+        hyprctl --batch "keyword general:gaps_in 5 ; keyword general:gaps_out 10 ; keyword general:border_size 2"
     notify-send -u low "  Gaps on"
 fi
