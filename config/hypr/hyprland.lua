@@ -22,18 +22,5 @@ require("hypr.autostart")
 -- Toggle config flags dynamically.
 require("default.hypr.toggles")
 
--- Workspace overview plugin (hyprexpo, installed from the AUR).
-hl.config({
-  plugin = {
-    hyprexpo = {
-      columns = 5,
-      gap_size = 8,
-      bg_col = "rgb(0a0a0a)",
-      workspace_method = "first 1",
-      workspace_amount = 10,
-    },
-  },
-})
-
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
