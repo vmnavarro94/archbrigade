@@ -19,8 +19,8 @@ qs_wait_and_toggle() {
   return 1
 }
 
-# 1) Already running — just toggle
-if pgrep -x quickshell >/dev/null 2>&1; then
+# 1) Already running — just toggle (the daemon's process name is qs, not quickshell)
+if pgrep -f "qs -c overview" >/dev/null 2>&1; then
   if qs_ipc_toggle; then
     exit 0
   fi
@@ -28,6 +28,10 @@ if pgrep -x quickshell >/dev/null 2>&1; then
   if qs_wait_and_toggle; then
     exit 0
   fi
+  # Running but IPC dead — kill it so we can respawn a healthy instance,
+  # instead of piling up duplicate daemons
+  pkill -f "qs -c overview" 2>/dev/null || true
+  sleep 0.2
 fi
 
 # 2) Not running — start it, then toggle
