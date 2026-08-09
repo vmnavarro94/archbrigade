@@ -11,9 +11,14 @@ if [[ -d "$HOME/.oh-my-zsh/themes" ]]; then
   cp "$ARCHBRIGADE_PATH/default/zsh/agnosterzak.zsh-theme" "$HOME/.oh-my-zsh/themes/agnosterzak.zsh-theme"
 fi
 
-# Remove the old migration-appended agnosterzak block (if present) since default/zshrc now includes it
-# Only remove the block if it was appended by the old migration (not user-customized)
-if grep -q '# oh-my-zsh with agnosterzak (replaces Starship)' "$HOME/.zshrc" 2>/dev/null; then
+# Remove the old migration-appended agnosterzak block (if present), but ONLY
+# when ~/.zshrc also contains the current default/zshrc prompt block ("# Shell
+# prompt (oh-my-zsh + agnosterzak powerline theme)"), which fresh installs get
+# as a copy of default/zshrc. Existing installs' ~/.zshrc sources
+# default/zsh/rc instead, which does NOT include the prompt block — stripping
+# the old block there would leave the user with a bare prompt.
+if grep -q '# oh-my-zsh with agnosterzak (replaces Starship)' "$HOME/.zshrc" 2>/dev/null &&
+  grep -q '# Shell prompt (oh-my-zsh + agnosterzak powerline theme)' "$HOME/.zshrc" 2>/dev/null; then
   sed -i '/# oh-my-zsh with agnosterzak (replaces Starship)/,/preexec_functions=.*starship.*/{
     /# oh-my-zsh with agnosterzak/d
     /export ZSH=/d
