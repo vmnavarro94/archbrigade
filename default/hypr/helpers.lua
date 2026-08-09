@@ -19,8 +19,16 @@ local function file_exists(path)
 end
 
 function o.shell_succeeds(command)
-  local ok, _, code = os.execute(command .. " >/dev/null 2>&1")
-  return ok == true or ok == 0 or code == 0
+  -- os.execute cannot be trusted here: Hyprland reaps children (SIGCHLD),
+  -- so its waitpid fails with ECHILD even when the command succeeds.
+  -- Capture the exit status through the pipe instead.
+  local pipe = io.popen("(" .. command .. ") >/dev/null 2>&1; echo $?")
+  if not pipe then
+    return false
+  end
+  local output = pipe:read("*a") or ""
+  pipe:close()
+  return output:match("^%s*0%s*$") ~= nil
 end
 
 function o.cmd_present(command)
